@@ -1,0 +1,107 @@
+#include "hamiltonian.hpp"
+#include "solver.hpp"
+#include "correlation.hpp"
+#include <gtest/gtest.h>
+
+/* ====================================================== */
+/* NOTE: The global variable approach for argc and argv is 
+   VERY important to pass the command line arguments to the 
+   test (like -malloc_dump). */
+/* ====================================================== */
+
+static char help[] = "This is a test to test the Correlation-SpSm class\n\n";
+int _argc;
+char ** _argv;
+
+Environment env{_argc,_argv,12,help};
+
+class HamiltonianTestEnv : public ::testing::Environment {
+protected:
+
+  virtual void TearDown() {
+    ::testing::internal::CaptureStdout();
+    EXPECT_EQ("", ::testing::internal::GetCapturedStdout());
+  }
+};
+
+
+TEST(SpSmCorrelation, chain1D) {
+  PetscReal J1 = 1.0;
+  PetscReal Delta1 = 1.0;
+  PetscReal J2 = 0.0;
+  PetscReal Delta2 = 0.0;
+  Basis b{env,0};
+  chain1D lat{env};
+  Hamiltonian<chain1D> h{env,b,lat,J1,Delta1,J2,Delta2};
+  PetscErrorCode ierr = 0;
+  EPS solver;
+  PetscInt nconv;
+  PetscScalar real_eig;
+  PetscReal error;
+  SpSm corr{env,b};
+  SmSp corr2{env,b};
+  PetscScalar * exp_val;
+  PetscCalloc1(b.nspins-1, &exp_val);
+
+  ierr = h.build_diag(env); ASSERT_EQ(0,ierr);
+  ierr = h.build_off_diag(env); ASSERT_EQ(0,ierr);
+
+#ifdef DISORDER
+  ierr = MatAssemblyBegin(h.hamilt,MAT_FINAL_ASSEMBLY); ASSERT_EQ(0,ierr);
+  ierr = MatAssemblyEnd(h.hamilt,MAT_FINAL_ASSEMBLY); ASSERT_EQ(0,ierr);
+#endif
+  
+  EXPECT_EQ(0,Solver::SolverInit(solver,h.hamilt,1));
+ 
+  ierr = Solver::solve_lanczos(env,solver,nconv); EXPECT_EQ(0,ierr);
+
+  Vec xr;
+  ierr = MatCreateVecs(h.hamilt,NULL,&xr); EXPECT_EQ(0,ierr);
+
+  ASSERT_GE(nconv,1);
+  if (nconv >= 1) {
+    ierr = Solver::solution(solver, 0, real_eig, xr, error); EXPECT_EQ(0,ierr);
+    EXPECT_NEAR(-5.387390917445223, PetscRealPart(real_eig), 1e-13);
+    EXPECT_PRED_FORMAT2(::testing::FloatLE, (double)error, 1e-8);
+  }
+
+  //  ierr = VecView(xr, PETSC_VIEWER_STDOUT_WORLD);
+
+  for (PetscInt i = 0; i < b.nspins-1; ++i)
+    exp_val[i] = corr.ExpectVal(env,0,i+1,xr);
+  
+  EXPECT_NEAR(-0.2992994969269388, PetscRealPart(exp_val[0]), 5e-09);
+  EXPECT_NEAR(0.1252218567331475, PetscRealPart(exp_val[1]), 5e-09);
+  EXPECT_NEAR(-0.1105478301121019, PetscRealPart(exp_val[2]), 5e-09);
+  EXPECT_NEAR(0.0805698223079831, PetscRealPart(exp_val[3]), 5e-09);
+  EXPECT_NEAR(-0.0816069934222130, PetscRealPart(exp_val[4]), 5e-09);
+  EXPECT_NEAR(0.0713252783099138, PetscRealPart(exp_val[5]), 5e-09);
+  EXPECT_NEAR(-0.0816069931168473, PetscRealPart(exp_val[6]), 5e-09);
+  EXPECT_NEAR(0.0805698224663357, PetscRealPart(exp_val[7]), 5e-09);
+  EXPECT_NEAR(-0.1105478292081782, PetscRealPart(exp_val[8]), 5e-09);
+  EXPECT_NEAR(0.1252218567977181, PetscRealPart(exp_val[9]), 5e-09);
+  EXPECT_NEAR(-0.2992994938288190, PetscRealPart(exp_val[10]), 5e-09);
+
+  // for (PetscInt i = 0; i < b.nspins-1; ++i)
+  //   PetscPrintf(PETSC_COMM_WORLD, "exp_val[%d]: %.16f\n", i, exp_val[i]);
+
+  // for (PetscInt i = 0; i < b.nspins-1; ++i)
+  //     exp_val[i] = corr2.ExpectVal(0,i+1,xr);
+  // for (PetscInt i = 0; i < b.nspins-1; ++i)
+  //   PetscPrintf(PETSC_COMM_WORLD, "exp_val[%d]: %.16f\n", i, exp_val[i]);
+
+  EXPECT_EQ(0, ierr);
+  EXPECT_EQ(0, Solver::SolverClean(solver));
+  EXPECT_EQ(0, VecDestroy(&xr));
+  
+}
+
+
+int main (int argc, char ** argv){
+  _argc = argc;
+  _argv = argv;
+  ::testing::InitGoogleTest(&argc, argv);
+  ::testing::AddGlobalTestEnvironment(new HamiltonianTestEnv);
+  return RUN_ALL_TESTS();
+}
+

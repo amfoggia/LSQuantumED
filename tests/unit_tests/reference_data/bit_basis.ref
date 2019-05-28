@@ -1,0 +1,21 @@
+A{6,0}
+A.bit_basis[0]: 000111
+A.bit_basis[1]: 001011
+A.bit_basis[2]: 001101
+A.bit_basis[3]: 001110
+A.bit_basis[4]: 010011
+A.bit_basis[5]: 010101
+A.bit_basis[6]: 010110
+A.bit_basis[7]: 011001
+A.bit_basis[8]: 011010
+A.bit_basis[9]: 011100
+A.bit_basis[10]: 100011
+A.bit_basis[11]: 100101
+A.bit_basis[12]: 100110
+A.bit_basis[13]: 101001
+A.bit_basis[14]: 101010
+A.bit_basis[15]: 101100
+A.bit_basis[16]: 110001
+A.bit_basis[17]: 110010
+A.bit_basis[18]: 110100
+A.bit_basis[19]: 111000

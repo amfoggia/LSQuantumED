@@ -1,0 +1,13 @@
+language: c++
+
+sudo: required
+
+services:
+  - docker
+
+before_install:
+- echo $PWD
+- docker pull af00/project:lighter
+
+script:
+- ./travis_runscript.sh "source /etc/profile && cd /home/QuantumMagnetsLSSimulation/c++ && meson build && cd build &&  meson test -v

@@ -1,0 +1,10 @@
+#ifndef __MESON_CONFIG_H_IN
+#define __MESON_CONFIG_H_IN
+
+#define _PROJECT_VERSION @version@
+
+#mesondefine DEVEL
+#mesondefine TIME_CODE
+#mesondefine DISORDER
+
+#endif

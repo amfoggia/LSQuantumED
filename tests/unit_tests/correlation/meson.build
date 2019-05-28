@@ -1,0 +1,3 @@
+subdir('SzSz')
+
+subdir('SpSm')
