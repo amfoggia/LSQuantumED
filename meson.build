@@ -44,6 +44,10 @@ if get_option('DISORDER') == true
    		             ['main_disorder.cpp', main_src],
               	             include_directories: inc,
                              dependencies: [petsc_dep, slepc_dep, mpi_dep])
+   exec_simple_main = executable('simple_main.x',
+   		                ['simple_main.cpp', main_src],
+              	                include_directories: inc,
+                                dependencies: [petsc_dep, slepc_dep, mpi_dep])
 endif
 
 exec_main = executable('main.x',
