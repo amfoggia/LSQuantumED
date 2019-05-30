@@ -33,17 +33,17 @@ int main(int argc, char * argv[]) {
     return 1;
   }
 
-  //// Create the environment 
+  //// Create the environment ----------------------------------------------------------------------
   Environment env{argc,argv,spins,help};
 
-  /// Read the other parameters from command line 
+  /// Read the other parameters from command line --------------------------------------------------
   parse_args();
   print_args();
 
-  //// Initialize random disorder object 
+  //// Initialize random disorder object -----------------------------------------------------------
   Tools::RandomDisorder rd{spins,reprod,min_dis,max_dis,rep};
 
-  //// Create the basis with total magnetization zero 
+  //// Create the basis with total magnetization zero ----------------------------------------------
   Basis b{env,0};
 
   //// Create a 1D chain lattice -------------------------------------------------------------------
