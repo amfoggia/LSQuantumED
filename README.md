@@ -13,15 +13,26 @@ dynamical structure factor.
 
 ### Compiling
 For this code you need:
- 1. [ninja](https://ninja-build.org/)
+ 1. [Ninja](https://ninja-build.org/)
  1. [Meson](https://mesonbuild.com/)
  2. [PETSc](https://www.mcs.anl.gov/petsc/) (in its complex versions with 64-bit integers)
  3. [SLEPc](http://slepc.upv.es/)
- 4. [boost](https://www.boost.org/)
+ 4. [Boost](https://www.boost.org/)
  5. an MPI implementation
 
+##### Compile not using Meson
+
 ```
-$ CXX=<mpi c++ compiler> meson dir/where/to/build
+$ mpicxx main.cpp ./src/*.cpp ./src/spinOperators/*.cpp ./src/tools/*.cpp `pkg-config --libs --cflags SLEPc` -I./include -I./include/spinOperators -I./include/tools -I/path-to-boost-lib/ -I/path-to-mpi-impl -o main.x
+```
+If you are not using `pkg-config` then you can link manually with PETSc and SLEPc libraries by adding the include directories and the library directories:
+```
+-I/path-to-slepc-build/include -I/path-to-petsc-build/include -L/path-to-slepc-build/lib -L/path-to-petsc-build/lib -lslepc -lpetsc
+```
+
+##### Compile using Meson
+```
+$ CXX=<mpi c++ compiler> CXXFLAGS='-I/path-to-boost-root-dir/ -I/path-to-the-mpi.h-file' meson dir/where/to/build
 $ cd dir/where/to/build
 $ ninja
 ```
@@ -37,5 +48,5 @@ To run a simple example, with the following setting:
  
 ```
 $ cd dir/where/to/build
-$ mpiexec -np N ./main.x nspins -nn j1 1.0 -d1 1.0 -eps_type krylovschur -eps_tol 1e-9
+$ mpiexec -np N ./main.x nspins -nn -j1 1.0 -d1 1.0 -eps_type krylovschur -eps_tol 1e-9
 ```
