@@ -1,9 +1,6 @@
 project('QuantumMagnetsLSSimulation', 'cpp', default_options : ['cpp_std=c++17'])
 
-# Use second option when running on Marconi
-#inc = include_directories(['.','include','include/spinOperators','include/tools','/opt/lib/boost_1_67_0'])
 inc = include_directories(['.','include','include/spinOperators','include/tools'])
-#inc = include_directories(['.','include','include/spinOperators','include/tools','/cineca/prod/opt/libraries/boost/1.66.0/intelmpi--2018--binary/include'])
 
 conf_data = configuration_data()
 conf_data.set_quoted('version', meson.project_version())
@@ -16,9 +13,6 @@ configure_file(input: 'include/meson_config.h.in',
 
 petsc_dep = dependency('PETSc')
 slepc_dep = dependency('SLEPc')
-
-# Comment when running on marconi
-mpi_dep = dependency('mpich')
 
 subdir('src')
 
@@ -37,23 +31,23 @@ if get_option('DISORDER') == false
    exec_main_NO_dis = executable('main_NO_disorder.x',
                                 ['main_NO_disorder.cpp', main_src],
                                 include_directories: inc,
-                                dependencies: [petsc_dep, slepc_dep, mpi_dep])
+                                dependencies: [petsc_dep, slepc_dep])
 endif
 
 if get_option('DISORDER') == true
    exec_main_dis = executable('main_disorder.x',
    		             ['main_disorder.cpp', main_src],
               	             include_directories: inc,
-                             dependencies: [petsc_dep, slepc_dep, mpi_dep])
+                             dependencies: [petsc_dep, slepc_dep])
    exec_simple_main = executable('simple_main.x',
    		                ['simple_main.cpp', main_src],
               	                include_directories: inc,
-                                dependencies: [petsc_dep, slepc_dep, mpi_dep])
+                                dependencies: [petsc_dep, slepc_dep])
 endif
 
 exec_main = executable('main.x',
                       ['main.cpp', main_src],
                       include_directories: inc,
-                      dependencies: [petsc_dep, slepc_dep, mpi_dep])
+                      dependencies: [petsc_dep, slepc_dep])
 
-subdir('tests')
+#subdir('tests')

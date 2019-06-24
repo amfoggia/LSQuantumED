@@ -1,22 +1,22 @@
 exec_basis1 = executable('basis1.x',
                         ['test_basis1.cpp', env, time, basis],
                         include_directories: inc,
-                        dependencies: [gtest_dep, petsc_dep, slepc_dep, mpi_dep])			  
+                        dependencies: [gtest_dep, petsc_dep, slepc_dep])			  
 
 exec_basis2 = executable('basis2.x',
                         ['test_basis2.cpp', env, time, basis],
                         include_directories: inc,
-                        dependencies: [gtest_dep, petsc_dep, slepc_dep, mpi_dep])
+                        dependencies: [gtest_dep, petsc_dep, slepc_dep])
 
 exec_basis3 = executable('basis3.x',
                         ['test_basis3.cpp', env, time, basis],
                         include_directories: inc,
-                        dependencies: [gtest_dep, petsc_dep, slepc_dep, mpi_dep])
+                        dependencies: [gtest_dep, petsc_dep, slepc_dep])
 
 exec_basis4 = executable('basis4.x',
                         ['test_basis4.cpp', env, time, basis],
                         include_directories: inc,
-                        dependencies: [gtest_dep, petsc_dep, slepc_dep, mpi_dep])
+                        dependencies: [gtest_dep, petsc_dep, slepc_dep])
 
 _tests = ['basis'] 
 _cases = ['1', '2']

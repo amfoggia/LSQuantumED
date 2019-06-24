@@ -1,17 +1,17 @@
 exec_build_diag125 = executable('build_diag125.x',
                                ['test_build_diag125.cpp', env, time, lattice, basis, hamilt],
                                include_directories: inc,
-                               dependencies: [petsc_dep, slepc_dep, mpi_dep])
+                               dependencies: [petsc_dep, slepc_dep])
 
 exec_build_diag124 = executable('build_diag124.x',
                                ['test_build_diag124.cpp', env, time, lattice, basis, hamilt],
                                include_directories: inc,
-                               dependencies: [petsc_dep, slepc_dep, mpi_dep])
+                               dependencies: [petsc_dep, slepc_dep])
 
 exec_build_diag82 = executable('build_diag82.x',
                               ['test_build_diag82.cpp', env, time, lattice, basis, hamilt],
                               include_directories: inc,
-                              dependencies: [petsc_dep, slepc_dep, mpi_dep])
+                              dependencies: [petsc_dep, slepc_dep])
 
 compare = find_program('../../../compare.sh')
 _prefix = meson.current_source_dir()

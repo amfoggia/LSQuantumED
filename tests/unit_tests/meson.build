@@ -10,7 +10,7 @@ gtest_dep = dependency('gtest', main:false,
 exec_construct_hamilt = executable('construct_hamilt.x',
                                   ['test_construct_hamilt.cpp', env, time, lattice, basis, hamilt],
                                   include_directories: inc,
-                                  dependencies: [gtest_dep, petsc_dep, slepc_dep, mpi_dep])
+                                  dependencies: [gtest_dep, petsc_dep, slepc_dep])
 
 _tests = ['construct_hamilt']
 

@@ -1,37 +1,37 @@
 exec_build_diag60 = executable('build_diag60.x',
                               ['test_build_diag60.cpp', env, time, lattice, basis, hamilt],
                               include_directories: inc,
-                              dependencies: [petsc_dep, slepc_dep, mpi_dep])
+                              dependencies: [petsc_dep, slepc_dep])
 
 exec_build_diag61 = executable('build_diag61.x',
                               ['test_build_diag61.cpp', env, time, lattice, basis, hamilt],
                               include_directories: inc,
-                              dependencies: [petsc_dep, slepc_dep, mpi_dep])
+                              dependencies: [petsc_dep, slepc_dep])
 
 exec_build_diag62 = executable('build_diag62.x',
                               ['test_build_diag62.cpp', env, time, lattice, basis, hamilt],
                               include_directories: inc,
-                              dependencies: [petsc_dep, slepc_dep, mpi_dep])
+                              dependencies: [petsc_dep, slepc_dep])
 
 exec_build_diag63 = executable('build_diag63.x',
                               ['test_build_diag63.cpp', env, time, lattice, basis, hamilt],
                               include_directories: inc,
-                              dependencies: [petsc_dep, slepc_dep, mpi_dep])
+                              dependencies: [petsc_dep, slepc_dep])
 
 exec_build_diag6m1 = executable('build_diag6m1.x',
                                ['test_build_diag6m1.cpp', env, time, lattice, basis, hamilt],
                                include_directories: inc,
-                               dependencies: [petsc_dep, slepc_dep, mpi_dep])
+                               dependencies: [petsc_dep, slepc_dep])
 
 exec_build_diag6m2 = executable('build_diag6m2.x',
                                ['test_build_diag6m2.cpp', env, time, lattice, basis, hamilt],
                                include_directories: inc,
-                               dependencies: [petsc_dep, slepc_dep, mpi_dep])
+                               dependencies: [petsc_dep, slepc_dep])
 
 exec_build_diag6m3 = executable('build_diag6m3.x',
                                ['test_build_diag6m3.cpp', env, time, lattice, basis, hamilt],
                                include_directories: inc,
-                               dependencies: [petsc_dep, slepc_dep, mpi_dep])
+                               dependencies: [petsc_dep, slepc_dep])
 
 compare = find_program('../../../compare.sh')
 _prefix = meson.current_source_dir()

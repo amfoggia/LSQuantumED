@@ -1,12 +1,12 @@
 exec_sqz1 = executable('sqz1.x',
                        ['test_sqz1.cpp', env, time, lattice, basis, hamilt, solver],
                        include_directories: inc,
-                       dependencies: [gtest_dep, petsc_dep, slepc_dep, mpi_dep])
+                       dependencies: [gtest_dep, petsc_dep, slepc_dep])
 
 # exec_sqz2 = executable('sqz2.x',
 #                        ['test_sqz2.cpp', env, time, lattice, basis, hamilt],
 #                        include_directories: inc,
-#                        dependencies: [gtest_dep, petsc_dep, slepc_dep, mpi_dep])
+#                        dependencies: [gtest_dep, petsc_dep, slepc_dep])
 
 _tests = ['sqz'] 
 _cases = ['1']

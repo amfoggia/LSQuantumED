@@ -1,17 +1,17 @@
 exec_get_coup_elems1 = executable('get_coup_elems1.x',
                                  ['test_get_coup_elems1.cpp', env, time, lattice, basis, hamilt],
                                  include_directories: inc,
-                                 dependencies: [gtest_dep, petsc_dep, slepc_dep, mpi_dep])
+                                 dependencies: [gtest_dep, petsc_dep, slepc_dep])
 
 exec_get_coup_elems2 = executable('get_coup_elems2.x',
                                  ['test_get_coup_elems2.cpp', env, time, lattice, basis, hamilt],
                                  include_directories: inc,
-                                 dependencies: [gtest_dep, petsc_dep, slepc_dep, mpi_dep])
+                                 dependencies: [gtest_dep, petsc_dep, slepc_dep])
 
 exec_get_coup_elems3 = executable('get_coup_elems3.x',
                                  ['test_get_coup_elems3.cpp', env, time, lattice, basis, hamilt],
                                  include_directories: inc,
-                                 dependencies: [gtest_dep, petsc_dep, slepc_dep, mpi_dep])
+                                 dependencies: [gtest_dep, petsc_dep, slepc_dep])
 
 _prefix = meson.current_source_dir()
 

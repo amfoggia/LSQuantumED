@@ -1,17 +1,17 @@
 exec_prealloc_info1 = executable('prealloc_info1.x',
                                  ['test_prealloc_info1.cpp', env, time, lattice, basis, hamilt],
                                  include_directories: inc,
-                                 dependencies: [gtest_dep, petsc_dep, slepc_dep, mpi_dep])
+                                 dependencies: [gtest_dep, petsc_dep, slepc_dep])
 
 exec_prealloc_info2 = executable('prealloc_info2.x',
                                  ['test_prealloc_info2.cpp', env, time, lattice, basis, hamilt],
                                  include_directories: inc,
-                                 dependencies: [gtest_dep, petsc_dep, slepc_dep, mpi_dep])
+                                 dependencies: [gtest_dep, petsc_dep, slepc_dep])
 
 exec_prealloc_info3 = executable('prealloc_info3.x',
                                  ['test_prealloc_info3.cpp', env, time, lattice, basis, hamilt],
                                  include_directories: inc,
-                                 dependencies: [gtest_dep, petsc_dep, slepc_dep, mpi_dep])
+                                 dependencies: [gtest_dep, petsc_dep, slepc_dep])
 
 _tests = ['prealloc_info'] 
 _cases = ['1', '3']

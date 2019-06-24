@@ -1,12 +1,12 @@
 exec_get_disorder_elem1 = executable('get_disorder_elem1.x',
                                 ['test_get_disorder_elem1.cpp', env, time, rand_dis, lattice, basis, hamilt],
                                 include_directories: inc,
-                                dependencies: [gtest_dep, petsc_dep, slepc_dep, mpi_dep])
+                                dependencies: [gtest_dep, petsc_dep, slepc_dep])
 
 exec_get_disorder_elem3 = executable('get_disorder_elem3.x',
                                 ['test_get_disorder_elem3.cpp', env, time, rand_dis, lattice, basis, hamilt],
                                 include_directories: inc,
-                                dependencies: [gtest_dep, petsc_dep, slepc_dep, mpi_dep])
+                                dependencies: [gtest_dep, petsc_dep, slepc_dep])
 
 _tests = ['get_disorder_elem'] 
 _cases = ['1','3']

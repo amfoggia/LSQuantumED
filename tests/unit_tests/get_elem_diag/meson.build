@@ -1,17 +1,17 @@
 exec_get_elem_diag1 = executable('get_elem_diag1.x',
                                 ['test_get_elem_diag1.cpp', env, time, lattice, basis, hamilt],
                                 include_directories: inc,
-                                dependencies: [gtest_dep, petsc_dep, slepc_dep, mpi_dep])
+                                dependencies: [gtest_dep, petsc_dep, slepc_dep])
 
 exec_get_elem_diag2 = executable('get_elem_diag2.x',
                                 ['test_get_elem_diag2.cpp', env, time, lattice, basis, hamilt],
                                 include_directories: inc,
-                                dependencies: [gtest_dep, petsc_dep, slepc_dep, mpi_dep])
+                                dependencies: [gtest_dep, petsc_dep, slepc_dep])
 
 exec_get_elem_diag3 = executable('get_elem_diag3.x',
                                 ['test_get_elem_diag3.cpp', env, time, lattice, basis, hamilt],
                                 include_directories: inc,
-                                dependencies: [gtest_dep, petsc_dep, slepc_dep, mpi_dep])
+                                dependencies: [gtest_dep, petsc_dep, slepc_dep])
 
 _tests = ['get_elem_diag'] 
 _cases = ['1', '2', '3']

@@ -1,12 +1,12 @@
 exec_sublattice1 = executable('sublattice1.x',
                              ['test_sublattice1.cpp', env, time, lattice, sublat],
                              include_directories: inc,
-                             dependencies: [gtest_dep, petsc_dep, slepc_dep, mpi_dep])
+                             dependencies: [gtest_dep, petsc_dep, slepc_dep])
 
 exec_sublattice2 = executable('sublattice2.x',
                              ['test_sublattice2.cpp', env, time, lattice, sublat],
                              include_directories: inc,
-                             dependencies: [gtest_dep, petsc_dep, slepc_dep, mpi_dep])
+                             dependencies: [gtest_dep, petsc_dep, slepc_dep])
 			  
 _tests = ['sublattice'] 
 _cases = ['1','2']

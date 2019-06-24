@@ -1,17 +1,17 @@
 exec_spsm1 = executable('spsm1.x',
                        ['test_spsm1.cpp', env, time, lattice, basis, hamilt, solver, correl],
                        include_directories: inc,
-                       dependencies: [gtest_dep, petsc_dep, slepc_dep, mpi_dep])
+                       dependencies: [gtest_dep, petsc_dep, slepc_dep])
 
 # exec_spsm2 = executable('spsm2.x',
 #                                 ['test_spsm2.cpp', env, time, lattice, basis, hamilt],
 #                                 include_directories: inc,
-#                                 dependencies: [gtest_dep, petsc_dep, slepc_dep, mpi_dep])
+#                                 dependencies: [gtest_dep, petsc_dep, slepc_dep])
 
 # exec_spsm3 = executable('spsm3.x',
 #                                 ['test_spsm3.cpp', env, time, lattice, basis, hamilt],
 #                                 include_directories: inc,
-#                                 dependencies: [gtest_dep, petsc_dep, slepc_dep, mpi_dep])
+#                                 dependencies: [gtest_dep, petsc_dep, slepc_dep])
 
 _tests = ['spsm'] 
 _cases = ['1']

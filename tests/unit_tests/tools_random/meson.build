@@ -1,7 +1,7 @@
 exec_tools_random1 = executable('tools_random1.x',
                                 ['test_tools_random1.cpp', rand_dis],
                                 include_directories: inc,
-                                dependencies: [gtest_dep, petsc_dep, slepc_dep, mpi_dep])
+                                dependencies: [gtest_dep, petsc_dep, slepc_dep])
 
 
 _tests = ['tools_random'] 

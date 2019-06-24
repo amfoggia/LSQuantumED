@@ -1,12 +1,12 @@
 exec_dsf1 = executable('dsf1.x',
                       ['test_dsf1.cpp', env, time, lattice, basis, hamilt, solver, correl, phys],
                       include_directories: inc,
-                      dependencies: [gtest_dep, petsc_dep, slepc_dep, mpi_dep])
+                      dependencies: [gtest_dep, petsc_dep, slepc_dep])
 
 # exec_dsf2 = executable('dsf2.x',
 #                       ['test_dsf2.cpp', env, time, lattice, basis, hamilt, solver, correl, phys],
 #                       include_directories: inc,
-#                       dependencies: [gtest_dep, petsc_dep, slepc_dep, mpi_dep])
+#                       dependencies: [gtest_dep, petsc_dep, slepc_dep])
 
 
 compare = find_program('../../compare.sh')

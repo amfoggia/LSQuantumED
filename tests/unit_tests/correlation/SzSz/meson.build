@@ -1,17 +1,17 @@
 exec_szsz1 = executable('szsz1.x',
                        ['test_szsz1.cpp', env, time, lattice, basis, hamilt, solver, correl],
                        include_directories: inc,
-                       dependencies: [gtest_dep, petsc_dep, slepc_dep, mpi_dep])
+                       dependencies: [gtest_dep, petsc_dep, slepc_dep])
 
 exec_szsz2 = executable('szsz2.x',
                        ['test_szsz2.cpp', env, time, lattice, basis, hamilt, solver, correl],
                        include_directories: inc,
-                       dependencies: [gtest_dep, petsc_dep, slepc_dep, mpi_dep])
+                       dependencies: [gtest_dep, petsc_dep, slepc_dep])
 
 # exec_szsz3 = executable('szsz3.x',
 #                                 ['test_szsz3.cpp', env, time, lattice, basis, hamilt],
 #                                 include_directories: inc,
-#                                 dependencies: [gtest_dep, petsc_dep, slepc_dep, mpi_dep])
+#                                 dependencies: [gtest_dep, petsc_dep, slepc_dep])
 
 _tests = ['szsz'] 
 _cases = ['1']
