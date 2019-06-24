@@ -14,9 +14,11 @@ dynamical structure factor.
 ### Compiling
 For this code you need [`Meson`] (https://mesonbuild.com/) tool, which requires [ninja](https://ninja-build.org/), [PETSc](https://www.mcs.anl.gov/petsc/) and [SLEPc](http://slepc.upv.es/) in their complex versions with 64-bit integers.
 
+```
 $ CXX=<mpi c++ compiler> meson dir/where/to/build
 $ cd dir/where/to/build
 $ ninja
+```
 
 ### Running
 To run a simple example, with the following setting:
@@ -27,5 +29,7 @@ To run a simple example, with the following setting:
  3. for `nspins` spins
  4. with `N` processes
  
+```
 $ cd dir/where/to/build
 $ mpiexec -np N ./main.x nspins -nn j1 1.0 -d1 1.0 -eps_type krylovschur -eps_tol 1e-9
+```
