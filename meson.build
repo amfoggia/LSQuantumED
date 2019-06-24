@@ -1,7 +1,8 @@
 project('QuantumMagnetsLSSimulation', 'cpp', default_options : ['cpp_std=c++17'])
 
 # Use second option when running on Marconi
-inc = include_directories(['.','include','include/spinOperators','include/tools','/opt/lib/boost_1_67_0'])	
+#inc = include_directories(['.','include','include/spinOperators','include/tools','/opt/lib/boost_1_67_0'])
+inc = include_directories(['.','include','include/spinOperators','include/tools'])
 #inc = include_directories(['.','include','include/spinOperators','include/tools','/cineca/prod/opt/libraries/boost/1.66.0/intelmpi--2018--binary/include'])
 
 conf_data = configuration_data()
