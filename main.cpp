@@ -100,7 +100,7 @@ int main(int argc, char * argv[]) {
   dsf_data.lat = &lattice;
   dsf_data.nQ = spins;
   dsf_data.qi = &tmp;
-  dsf_data.nev = 1;
+  dsf_data.nev = 10;
   dsf_data.ncv = PETSC_DECIDE;
   dsf_data.mpd = PETSC_DECIDE;
 #ifdef DISORDER
