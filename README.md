@@ -12,7 +12,13 @@ the computation of several parameters: order parameter (magnetization), correlat
 dynamical structure factor.
 
 ### Compiling
-For this code you need [`Meson`] (https://mesonbuild.com/) tool, which requires [ninja](https://ninja-build.org/), [PETSc](https://www.mcs.anl.gov/petsc/) and [SLEPc](http://slepc.upv.es/) in their complex versions with 64-bit integers.
+For this code you need:
+ 1. [ninja](https://ninja-build.org/)
+ 1. [Meson](https://mesonbuild.com/)
+ 2. [PETSc](https://www.mcs.anl.gov/petsc/) (in its complex versions with 64-bit integers)
+ 3. [SLEPc](http://slepc.upv.es/)
+ 4. [boost](https://www.boost.org/)
+ 5. an MPI implementation
 
 ```
 $ CXX=<mpi c++ compiler> meson dir/where/to/build
