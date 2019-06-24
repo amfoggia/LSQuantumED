@@ -48,5 +48,5 @@ To run a simple example, with the following setting:
  
 ```
 $ cd dir/where/to/build
-$ mpiexec -np N ./main.x nspins -nn j1 1.0 -d1 1.0 -eps_type krylovschur -eps_tol 1e-9
+$ mpiexec -np N ./main.x nspins -nn -j1 1.0 -d1 1.0 -eps_type krylovschur -eps_tol 1e-9
 ```
