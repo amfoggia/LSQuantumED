@@ -10,3 +10,22 @@ extending the available lattices is possible.
 This code has as final purpose the study of frustrated magnetic systems, and for that it includes 
 the computation of several parameters: order parameter (magnetization), correlation functions and 
 dynamical structure factor.
+
+### Compiling
+For this code you need [`Meson`] (https://mesonbuild.com/) tool, which requires [ninja](https://ninja-build.org/), [PETSc](https://www.mcs.anl.gov/petsc/) and [SLEPc](http://slepc.upv.es/) in their complex versions with 64-bit integers.
+
+$ CXX=<mpi c++ compiler> meson dir/where/to/build
+$ cd dir/where/to/build
+$ ninja
+
+### Running
+To run a simple example, with the following setting:
+ 1. no disorder
+ 2. with nearest neighbours interactions only
+ 3. no anisotropy in the z-direction
+ 2. computing 10 excited states for the dynamical structure factor
+ 3. for `nspins` spins
+ 4. with `N` processes
+ 
+$ cd dir/where/to/build
+$ mpiexec -np N ./main.x nspins -nn j1 1.0 -d1 1.0 -eps_type krylovschur -eps_tol 1e-9
