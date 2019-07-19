@@ -18,7 +18,8 @@ For this code you need:
  2. [PETSc](https://www.mcs.anl.gov/petsc/) (in its complex versions with 64-bit integers)
  3. [SLEPc](http://slepc.upv.es/)
  4. [Boost](https://www.boost.org/)
- 5. an MPI implementation
+ 5. An MPI implementation
+ 6. [Doxygen](http://www.doxygen.nl/) for documentation
 
 ##### Compile not using Meson
 
@@ -49,4 +50,9 @@ To run a simple example, with the following setting:
 ```
 $ cd dir/where/to/build
 $ mpiexec -np N ./main.x nspins -nn -j1 1.0 -d1 1.0 -eps_type krylovschur -eps_tol 1e-9
+```
+
+### Documentation
+```
+$ doxygen docs_gen dir/for/docs
 ```
