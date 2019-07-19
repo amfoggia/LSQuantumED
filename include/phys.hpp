@@ -29,8 +29,6 @@ namespace Phys {
     L* lat;                    /**< Lattice object. */
     Hamiltonian<L>* h0;        /**< Hamiltonian of the Mag = 0 subspace. */
     Hamiltonian<L>* h1;        /**< Hamiltonian of the new subspace. */
-    PetscInt nQ;               /**< Number of q values for which to compute DSF. */
-    std::vector<PetscInt>* qi; /**< Indices of q for which to compute DSF. */
     PetscInt nev;              /**< Number of eigenvalues to compute. */
     PetscInt ncv;              /**< Maximum dimension of the subspace to be used by the solver. */
     PetscInt mpd;              /**< Maximum dimension allowed for the projected problem. */

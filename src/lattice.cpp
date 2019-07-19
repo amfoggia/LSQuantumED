@@ -16,10 +16,10 @@ chain1D::chain1D(Environment& env)
     nn.shrink_to_fit();
     nnn = get_nnn();
     nnn.shrink_to_fit();
-    r = construct_r();
-    r.shrink_to_fit();
-    q = construct_q();
-    q.shrink_to_fit();
+    // r = construct_r();
+    // r.shrink_to_fit();
+    // q = construct_q();
+    // q.shrink_to_fit();
 #ifdef TIME_CODE
   }
   env.tm.PrintTimeInfoFunc("Lattice");
@@ -56,25 +56,25 @@ std::vector<PetscInt>& chain1D::get_nnn() {
 
 /* --------------------------------------------------------------------------- */
 
-std::vector<std::array<PetscInt,2>>& chain1D::construct_r() {
+// std::vector<std::array<PetscInt,2>>& chain1D::construct_r() {
 
-  for (PetscInt i = 0; i < nspins; ++i)
-    r.push_back(std::array<PetscInt,2>{i,0});
+//   for (PetscInt i = 0; i < nspins; ++i)
+//     r.push_back(std::array<PetscInt,2>{i,0});
   
-  return r;
-}
+//   return r;
+// }
 
 /* --------------------------------------------------------------------------- */
 
-std::vector<std::array<PetscReal,2>>& chain1D::construct_q() {
+// std::vector<std::array<PetscReal,2>>& chain1D::construct_q() {
 
-  const PetscReal pi = boost::math::constants::pi<PetscReal>();
-  PetscReal factor = 2.0 * pi / PetscReal(nspins);
-  for (PetscInt i = 0; i < nspins; ++i)
-    q.push_back(std::array<PetscReal,2>{PetscReal(i)*factor,0});
+//   const PetscReal pi = boost::math::constants::pi<PetscReal>();
+//   PetscReal factor = 2.0 * pi / PetscReal(nspins);
+//   for (PetscInt i = 0; i < nspins; ++i)
+//     q.push_back(std::array<PetscReal,2>{PetscReal(i)*factor,0});
 
-  return q;
-}
+//   return q;
+// }
 
 /* --------------------------------------------------------------------------- */
 // ------------------------------ 2D Square Lattice -------------------------- //
@@ -101,10 +101,10 @@ square2D::square2D(Environment& env,
     nn.shrink_to_fit();
     nnn = get_nnn();
     nnn.shrink_to_fit();
-    r = construct_r();
-    r.shrink_to_fit();
-    q = construct_q();
-    q.shrink_to_fit();
+    // r = construct_r();
+    // r.shrink_to_fit();
+    // q = construct_q();
+    // q.shrink_to_fit();
 #ifdef TIME_CODE
   }
   env.tm.PrintTimeInfoFunc("Lattice");
@@ -165,27 +165,27 @@ std::vector<PetscInt>& square2D::get_nnn() {
 
 /* --------------------------------------------------------------------------- */
 
-std::vector<std::array<PetscInt,2>>& square2D::construct_r() {
+// std::vector<std::array<PetscInt,2>>& square2D::construct_r() {
   
-  for (PetscInt ix = 0; ix < nspins_x; ++ix)
-    for (PetscInt iy = 0; iy < nspins_y; ++iy)
-      r.push_back(std::array<PetscInt,2>{ix,iy});
-  return r;
-}
+//   for (PetscInt ix = 0; ix < nspins_x; ++ix)
+//     for (PetscInt iy = 0; iy < nspins_y; ++iy)
+//       r.push_back(std::array<PetscInt,2>{ix,iy});
+//   return r;
+// }
 
 /* --------------------------------------------------------------------------- */
 
-std::vector<std::array<PetscReal,2>>& square2D::construct_q() {
+// std::vector<std::array<PetscReal,2>>& square2D::construct_q() {
 
-  const PetscReal pi = boost::math::constants::pi<PetscReal>();
-  PetscReal factor_x = 2.0 * pi / PetscReal(nspins_x);
-  PetscReal factor_y = 2.0 * pi / PetscReal(nspins_y);
+//   const PetscReal pi = boost::math::constants::pi<PetscReal>();
+//   PetscReal factor_x = 2.0 * pi / PetscReal(nspins_x);
+//   PetscReal factor_y = 2.0 * pi / PetscReal(nspins_y);
 
-  for (PetscInt ix = 0; ix < nspins_x; ++ix)
-    for (PetscInt iy = 0; iy < nspins_y; ++iy)
-      q.push_back(std::array<PetscReal,2>{PetscReal(ix)*factor_x, PetscReal(iy)*factor_y});
+//   for (PetscInt ix = 0; ix < nspins_x; ++ix)
+//     for (PetscInt iy = 0; iy < nspins_y; ++iy)
+//       q.push_back(std::array<PetscReal,2>{PetscReal(ix)*factor_x, PetscReal(iy)*factor_y});
   
-  return q;
-}
+//   return q;
+// }
 
 

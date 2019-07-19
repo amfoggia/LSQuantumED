@@ -5,8 +5,6 @@
 /* ------------------------ RandomDisorder Class ----------------------------- */
 /* --------------------------------------------------------------------------- */
 
-#ifdef DISORDER
-
 Tools::RandomDisorder::RandomDisorder(PetscInt m_nspins,
 				      PetscBool m_reprod,
 				      PetscReal m_min,
@@ -59,7 +57,5 @@ void Tools::RandomDisorder::hi_init(PetscInt dis_index) {
   for (PetscInt spin = 0; spin < nspins; ++spin)
     hi[spin] = dist(gen);
 }
-
-#endif
 
 /* --------------------------------------------------------------------------- */

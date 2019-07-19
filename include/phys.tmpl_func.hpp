@@ -17,29 +17,25 @@ PetscScalar Phys::DynStructFactor(Environment& env,
 #endif
     
     PetscErrorCode ierr = 0;
-    PetscReal dsf2;
-    std::array<PetscReal,2> q;
-  
+    
     Vec rhs, eig_vec;
     ierr = MatCreateVecs(data.h1->hamilt,&eig_vec,NULL); CHKERRQ(ierr);
-    ierr = VecCreateMPI(PETSC_COMM_WORLD, PETSC_DECIDE, data.b1->size, &rhs); CHKERRQ(ierr);
-    // ierr = VecDuplicate(state, &rhs); CHKERRQ(ierr);
+    //ierr = VecCreateMPI(PETSC_COMM_WORLD, PETSC_DECIDE, data.b1->size, &rhs); CHKERRQ(ierr);
+    ierr = VecDuplicate(state, &rhs); CHKERRQ(ierr);
 
     EPS DSF_solver;
     PetscInt nconv;
     PetscScalar eig_val;
     PetscReal error;
-    std::vector<PetscScalar> c0, eigenvals;
-    PetscInt offset;
 
 #ifdef TIME_CODE
     {
       Tools::ScopedTimer _timer_{env.tm, "SolverDSF"};
 #endif
       
-    // Initiate solver and solve
-    ierr = Solver::SolverInit(DSF_solver, data.h1->hamilt, data.nev, data.ncv, data.mpd); CHKERRQ(ierr);
-    ierr = Solver::solve_lanczos(env, DSF_solver, nconv); CHKERRQ(ierr);
+      // Initiate solver and solve
+      ierr = Solver::SolverInit(DSF_solver, data.h1->hamilt, data.nev, data.ncv, data.mpd); CHKERRQ(ierr);
+      ierr = Solver::solve_lanczos(env, DSF_solver, nconv); CHKERRQ(ierr);
 #ifdef TIME_CODE
     }
 #endif
@@ -78,46 +74,47 @@ PetscScalar Phys::DynStructFactor(Environment& env,
 			dsf_fp, "#----- Energy -----  ------ Factor -----\n"); CHKERRQ(ierr);
     // ------------------------------- FILE -------------------------------------
 
-    for (PetscInt iter_q = 0; iter_q < data.nQ; ++ iter_q) {
-
-      q = data.lat->get_q((*data.qi)[iter_q]);
-
-      ierr = PetscFPrintf(PETSC_COMM_WORLD, dsf_fp, "# iter_q: %d\n", (*data.qi)[iter_q]); CHKERRQ(ierr);
+    // Build Sq operator
+    Sq_data<L> sq_data{data.b0, data.b1, data.lat};
+    SQ<L> sq_oper{env, sq_data};
+    std::vector<PetscScalar> c0, eigenvals;
     
-      // Build Sq operator
-      Sq_data<L> sq_data{data.b0, data.b1, data.lat, q};
-      SQ<L> sq_oper{env, sq_data};
-    
+    for (PetscInt iter_s = 0; iter_s < env.nspins; ++iter_s) {
+        
       // Compute initial vector
-      ierr = sq_oper.OpOnStateVector(env, state, rhs); CHKERRQ(ierr);
+      ierr = sq_oper.OpOnStateVector(env, state, rhs, iter_s); CHKERRQ(ierr);
 
 #ifdef TIME_CODE
       {
 	Tools::ScopedTimer _timer_{env.tm,"CoeffDSF"};
 #endif
-      // Get eigenvectors and do the product with the rhs vector
-      for (PetscInt i = 0; i < data.nev; ++i) {
-	ierr = Solver::solution(DSF_solver, i, eig_val, eig_vec, error); CHKERRQ(ierr);
-	eigenvals.push_back(eig_val);
-	ierr = VecDot(rhs, eig_vec, &dsf); CHKERRQ(ierr); // --> VecDot(x,y) = y^H x
-	dsf2 = std::norm<PetscReal>(dsf);
-	c0.push_back(dsf2);
-      }
+	// Get eigenvectors and do the product with the rhs vector
+	for (PetscInt i = 0; i < data.nev; ++i) {
+	  ierr = Solver::solution(DSF_solver, i, eig_val, eig_vec, error); CHKERRQ(ierr);
+	  eigenvals.push_back(eig_val);
+	  ierr = VecDot(rhs, eig_vec, &dsf); CHKERRQ(ierr); // --> VecDot(x,y) = y^H x
+	  c0.push_back(dsf);
+	}
 #ifdef TIME_CODE
       }
 #endif
+      
+    } // -- for iter_s
 
-      // Write to file
-      offset = data.nev * iter_q;
-      for (PetscInt i = offset; i < offset + data.nev; ++i) {
+    // Write to file
+    PetscInt offset;
+    for (PetscInt spin = 0; spin < env.nspins; ++spin){
+      ierr = PetscFPrintf(PETSC_COMM_WORLD, dsf_fp, "# spin: %d\n", spin); CHKERRQ(ierr);
+      offset = spin*data.nev;
+      for (PetscInt i = 0; i < data.nev; ++i) {
 	ierr = PetscFPrintf(PETSC_COMM_WORLD,
 			    dsf_fp,
 			    "%.13e  %.13e\n",
-			    PetscRealPart(eigenvals[i] - gs),
-			    PetscRealPart(c0[i])); CHKERRQ(ierr);
-      } // -- for nconv
-    } // -- for iter_q
-
+			    PetscRealPart(eigenvals[i+offset] - gs),
+			    PetscRealPart(c0[i+offset])); CHKERRQ(ierr);
+      }
+    }
+    
     ierr = Solver::SolverClean(DSF_solver); CHKERRQ(ierr);
     ierr = VecDestroy(&rhs); CHKERRQ(ierr);
     ierr = VecDestroy(&eig_vec); CHKERRQ(ierr);

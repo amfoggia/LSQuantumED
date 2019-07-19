@@ -7,41 +7,27 @@
 #include <cstdlib>
 #include <petsctime.h>
 
-static char help[] = "1/2-spin system governed by antiferromagnetic Heisenberg Hamiltonian with nn and nnn interactions, with constant total magnetization\n";
+static char help[] = "Hamiltonian with constant total magnetization (U(1) symmetry)\n";
 
 int main(int argc, char * argv[]) {
 
   EPS solver;
-  
+
   PetscErrorCode ierr = 0;
-  PetscLogStage stage1, stage2, stage3, stage4a, stage4b, stage7;
+  PetscLogStage stage1, stage2, stage3, stage4a, stage4b;
   PetscInt nconv, spins;
   PetscScalar real_eig;
   Vec real_vec;
   PetscReal error;
   PetscScalar exp_val, magAF = 0.0;
-
-  if (argc < 2) {
-    std::cout << "At leats one argument is needed. "
-  	      << "Number of total spins need to be provided after the executable's name.\n";
-    return 1;
-  }
-  
-  std::istringstream iss(argv[1]);
-  if ( !(iss >> spins) ) {
-    std::cout << "Number of total spins need to be provided after the executable's name.\n";
-    return 1;
-  }
   
   Environment env{argc,argv,spins,help};
   
   parse_args();
   print_args();
-
-#ifdef DISORDER
-  Tools::RandomDisorder rd{spins,reprod,min_dis,max_dis,rep};
-#endif
   
+  Tools::RandomDisorder rd{spins,reprod,min_dis,max_dis,rep};
+
   ierr = PetscPrintf(MPI_COMM_WORLD, "1- Creating basis\n");
   
   PetscLogStageRegister("Create Basis", &stage1);
@@ -51,7 +37,7 @@ int main(int argc, char * argv[]) {
   
   ierr = PetscPrintf(MPI_COMM_WORLD, "2- Creating lattice\n"); CHKERRQ(ierr);
 
-  PetscLogStageRegister("Create Lattice", &stage2);
+  PetscLogStageRegister("Create Latice", &stage2);
   PetscLogStagePush(stage2);
   chain1D lattice{env};
   //  AF<2,square2D> sub_af{lattice};
@@ -77,59 +63,32 @@ int main(int argc, char * argv[]) {
   PetscLogStagePush(stage4b);
   ierr = h.build_off_diag(env); CHKERRQ(ierr);
   PetscLogStagePop();
-
-#ifndef DISORDER
-  ierr = MatAssemblyBegin(h.hamilt,MAT_FINAL_ASSEMBLY); CHKERRQ(ierr);
-  ierr = MatAssemblyEnd(h.hamilt,MAT_FINAL_ASSEMBLY); CHKERRQ(ierr);
-#endif
     
   //  ierr = PetscPrintf(MPI_COMM_WORLD, "4c- Building disorder part\n"); CHKERRQ(ierr);
   ierr = PetscPrintf(PETSC_COMM_WORLD,
 		     " iter          k          ||Ax-kx||/||kx||\n"
 		     " ----    -------------   ------------------\n"); CHKERRQ(ierr);
 
-  // DSF input data
-  std::vector<PetscInt> tmp;
-  for (PetscInt i = 0; i < spins; ++i)
-    tmp.push_back(i);
-
   PetscScalar dynstructfactor;
   Phys::DSF_data<chain1D> dsf_data{};
   dsf_data.b0 = &b;
   dsf_data.b1 = &b;
   dsf_data.lat = &lattice;
-  dsf_data.nQ = spins;
-  dsf_data.qi = &tmp;
   dsf_data.nev = 10;
   dsf_data.ncv = PETSC_DECIDE;
   dsf_data.mpd = PETSC_DECIDE;
-#ifdef DISORDER
   dsf_data.disorder = PETSC_TRUE;
-#else
-  dsf_data.disorder = PETSC_FALSE;
-#endif
   dsf_data.path = "./";
-
-#ifndef DISORDER
-  ierr = MatCreateVecs(h.hamilt,&real_vec,NULL); CHKERRQ(ierr);
-#endif
-
-#ifdef DISORDER
+  
   for (int repet = 0; repet < rep; ++repet) {
     rd.hi_init(repet);
     ierr = h.build_disorder(env,rd.hi); CHKERRQ(ierr);
-    dsf_data.hi = rd.hi;
-#else
-    int repet = 0;
-    dsf_data.hi = NULL;
-#endif
     dsf_data.h0 = &h;
     dsf_data.h1 = &h;
+    dsf_data.hi = rd.hi;
     ierr = Solver::SolverInit(solver,h.hamilt,1); CHKERRQ(ierr);
     ierr = Solver::solve_lanczos(env,solver,nconv); CHKERRQ(ierr);
-#ifdef DISORDER
-    ierr = MatCreateVecs(h.hamilt,&real_vec,NULL); CHKERRQ(ierr);
-#endif
+    ierr = MatCreateVecs(h.hamilt,&real_vec,NULL); CHKERRQ(ierr); // --> In here, only when there's disorder
     if (nconv > 0) {      
       for (PetscInt i = 0; i < 1; ++i) {
 	TIME_IT(env.tm, "Get Eigen", ierr = Solver::solution(solver,i,real_eig,real_vec,error)); CHKERRQ(ierr);
@@ -155,27 +114,12 @@ int main(int argc, char * argv[]) {
 
     // PetscPrintf(PETSC_COMM_WORLD, "magAF: %.10f\n", magAF/PetscReal(rep)); CHKERRQ(ierr);
 
-
-    ierr = PetscPrintf(MPI_COMM_WORLD, "8- Phys quantities\n"); CHKERRQ(ierr);
-
-#ifndef DISORDER
-    PetscLogStageRegister("Phys quantities", &stage7);
-    PetscLogStagePush(stage7);
-#endif
     dynstructfactor = Phys::DynStructFactor<chain1D,Sqz>(env, dsf_data, real_eig, real_vec, repet);
-#ifndef DISORDER
-    PetscLogStagePop();
-#endif
 
     ierr = Solver::SolverClean(solver); CHKERRQ(ierr);
-#ifdef DISORDER
-    ierr = VecDestroy(&real_vec); CHKERRQ(ierr);
+    ierr = VecDestroy(&real_vec); CHKERRQ(ierr); // --> In here, only when there's disorder
   } // -- for repet
-#endif
 
-#ifndef DISORDER
-  ierr = VecDestroy(&real_vec); CHKERRQ(ierr);
-#endif
   ierr = PetscPrintf(MPI_COMM_WORLD, "9- Cleaning\n"); CHKERRQ(ierr);
 
 #ifdef TIME_CODE

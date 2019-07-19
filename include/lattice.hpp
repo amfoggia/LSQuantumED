@@ -98,19 +98,19 @@ protected:
    */
   virtual std::vector<PetscInt>& get_nnn() = 0;
   
-  /**
-   * @fn construct_r
-   * @brief Generates the list of distances of each spin to the origin.
-   * @return Vector with list of distances of each spin to the origin.
-   */
-  virtual std::vector<std::array<PetscInt,2>>& construct_r() = 0;
+  // /**
+  //  * @fn construct_r
+  //  * @brief Generates the list of distances of each spin to the origin.
+  //  * @return Vector with list of distances of each spin to the origin.
+  //  */
+  // virtual std::vector<std::array<PetscInt,2>>& construct_r() = 0;
 
-  /**
-   * @fn construct_q
-   * @brief Generates the list of lattice vectors.
-   * @return Vector with list of lattice vectors.
-   */
-  virtual std::vector<std::array<PetscReal,2>>& construct_q() = 0;
+  // /**
+  //  * @fn construct_q
+  //  * @brief Generates the list of lattice vectors.
+  //  * @return Vector with list of lattice vectors.
+  //  */
+  // virtual std::vector<std::array<PetscReal,2>>& construct_q() = 0;
 
 public:
 
@@ -146,19 +146,19 @@ public:
    */
   virtual PetscInt num_spins() {return nspins;};
 
-  /**
-   * @fn get_r()
-   * @brief Gives "read-only" access to the distance vector.
-   * @return Distance vector.
-   */
-  virtual const std::array<PetscInt,2>& get_r(PetscInt i) const = 0;
+  // /**
+  //  * @fn get_r()
+  //  * @brief Gives "read-only" access to the distance vector.
+  //  * @return Distance vector.
+  //  */
+  // virtual const std::array<PetscInt,2>& get_r(PetscInt i) const = 0;
   
-  /**
-   * @fn get_q()
-   * @brief Gives "read-only" access to the lattice vectors.
-   * @return Lattice vectors.
-   */
-  virtual const std::array<PetscReal,2>& get_q(PetscInt i) const = 0;
+  // /**
+  //  * @fn get_q()
+  //  * @brief Gives "read-only" access to the lattice vectors.
+  //  * @return Lattice vectors.
+  //  */
+  // virtual const std::array<PetscReal,2>& get_q(PetscInt i) const = 0;
   
   /**
    * @fn ~Lattice
@@ -185,8 +185,8 @@ private:
 
   std::vector<PetscInt>& get_nnn();
 
-  std::vector<std::array<PetscInt,2>>& construct_r();
-  std::vector<std::array<PetscReal,2>>& construct_q();
+  // std::vector<std::array<PetscInt,2>>& construct_r();
+  // std::vector<std::array<PetscReal,2>>& construct_q();
   
   template<typename L> friend class Hamiltonian;
   template<int size,typename L> friend class AF;
@@ -214,8 +214,8 @@ public:
 #endif
   std::vector<PetscInt> nn; /**< List of nearest neighbours of each spin. */  
   std::vector<PetscInt> nnn; /**< List of next-nearest neighbours of each spin. */
-  std::vector<std::array<PetscInt,2>> r; /**< List of distances of each spin to the origin. */
-  std::vector<std::array<PetscReal,2>> q; /**< List of lattice vectors. */
+  // std::vector<std::array<PetscInt,2>> r; /**< List of distances of each spin to the origin. */
+  // std::vector<std::array<PetscReal,2>> q; /**< List of lattice vectors. */
 
 public:
   
@@ -230,8 +230,8 @@ public:
 
   PetscInt num_neighbours() {return 1;}
 
-  const std::array<PetscInt,2>& get_r(PetscInt i) const {return r[i];}
-  const std::array<PetscReal,2>& get_q(PetscInt i) const {return q[i];}
+  // const std::array<PetscInt,2>& get_r(PetscInt i) const {return r[i];}
+  // const std::array<PetscReal,2>& get_q(PetscInt i) const {return q[i];}
 };
 
 /* --------------------------------------------------------------------------- */
@@ -254,8 +254,8 @@ private:
 
   std::vector<PetscInt>& get_nnn();
 
-  std::vector<std::array<PetscInt,2>>& construct_r();
-  std::vector<std::array<PetscReal,2>>& construct_q();
+  // std::vector<std::array<PetscInt,2>>& construct_r();
+  // std::vector<std::array<PetscReal,2>>& construct_q();
   
   template<typename L> friend class Hamiltonian;
   template<int size,typename L> friend class AF;
@@ -283,8 +283,8 @@ public:
 #endif
   std::vector<PetscInt> nn; /**< List of nearest neighbours of each spin. */  
   std::vector<PetscInt> nnn; /**< List of next-nearest neighbours of each spin. */
-  std::vector<std::array<PetscInt,2>> r; /**< List of distances of each spin to the origin. */
-  std::vector<std::array<PetscReal,2>> q; /**< List of lattice vectors. */
+  // std::vector<std::array<PetscInt,2>> r; /**< List of distances of each spin to the origin. */
+  // std::vector<std::array<PetscReal,2>> q; /**< List of lattice vectors. */
   
 public:
 
@@ -303,8 +303,8 @@ public:
 
   PetscInt num_neighbours() {return 2;}
 
-  const std::array<PetscInt,2>& get_r(PetscInt i) const {return r[i];}
-  const std::array<PetscReal,2>& get_q(PetscInt i) const {return q[i];}
+  // const std::array<PetscInt,2>& get_r(PetscInt i) const {return r[i];}
+  // const std::array<PetscReal,2>& get_q(PetscInt i) const {return q[i];}
 };
 
 #endif

@@ -322,14 +322,13 @@ PetscErrorCode Hamiltonian<L>::build_off_diag(Environment& env) {
     Tools::ScopedTimer _timer_{env.tm, "MatAssembly-offdiag"};
 #endif
 
-#ifndef DISORDER
-    ierr = MatAssemblyBegin(hamilt,MAT_FINAL_ASSEMBLY); CHKERRQ(ierr);
-    ierr = MatAssemblyEnd(hamilt,MAT_FINAL_ASSEMBLY); CHKERRQ(ierr);
-#else
-    ierr = MatAssemblyBegin(hamilt,MAT_FLUSH_ASSEMBLY); CHKERRQ(ierr);
-    ierr = MatAssemblyEnd(hamilt,MAT_FLUSH_ASSEMBLY); CHKERRQ(ierr);
-#endif
-    
+    if (env.disorder_flg == false) {
+      ierr = MatAssemblyBegin(hamilt,MAT_FINAL_ASSEMBLY); CHKERRQ(ierr);
+      ierr = MatAssemblyEnd(hamilt,MAT_FINAL_ASSEMBLY); CHKERRQ(ierr);
+    } else {
+      ierr = MatAssemblyBegin(hamilt,MAT_FLUSH_ASSEMBLY); CHKERRQ(ierr);
+      ierr = MatAssemblyEnd(hamilt,MAT_FLUSH_ASSEMBLY); CHKERRQ(ierr);    
+    }
     
 #ifdef TIME_CODE
   }
@@ -511,10 +510,10 @@ PetscErrorCode Hamiltonian<L>::prealloc(Environment& env) {
   
   ierr = PetscFree(coup_elems);
 
-#ifndef DISORDER
+  //#ifndef DISORDER
   // Add one for the diagonal element if at least one Delta is not zero
   if ((std::fabs(Delta1) >= 1e-14) | (std::fabs(Delta2) >= 1e-14))
-#endif
+    //#endif
     for (PetscInt i = 0; i < local_size; ++i)
       d_nnz[i] += 1;
   

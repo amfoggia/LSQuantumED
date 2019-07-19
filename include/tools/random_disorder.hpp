@@ -31,8 +31,14 @@ namespace Tools {
     PetscInt rep; /**< Number of repetitions for disorder computations. */
     PetscInt nspins; /**< Number of spins in the system. */
     PetscInt* srand_seq; /**< Vector with seeds for the random generator. */
-    PetscReal* hi; /**< Vector with disorer values per site. */
+    PetscReal* hi; /**< Vector with disorder values per site. */
 
+    /**
+     * @fn RandomDisorder()
+     * @brief Constructor. Default constructor.
+     */
+    RandomDisorder() {}
+    
     /**
      * @fn RandomDisorder(PetscInt, PetscBool, PetscReal, PetscReal, PetscInt)
      * @brief Constructor. Constructs the (random) seeds and the hi disoder vector.

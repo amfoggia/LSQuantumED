@@ -7,6 +7,24 @@
 
 Environment::Environment(int argc,
 			 char ** argv,
+			 char* m_help)
+{
+  ierr = SlepcInitialize(&argc, &argv, (char*) 0, m_help);
+  MPI_Comm_size(PETSC_COMM_WORLD, &mpi_size);
+  MPI_Comm_rank(PETSC_COMM_WORLD, &mpi_rank);
+#ifdef TIME_CODE
+  tm = Tools::TimeMonitor{PETSC_COMM_WORLD};
+#endif
+
+  nspins = 0;
+  disorder_flg = PETSC_FALSE;
+    
+  if (ierr != 0)
+    throw std::runtime_error("Slepc was not correctly initialized\n");
+}
+
+Environment::Environment(int argc,
+			 char ** argv,
 			 PetscInt m_nspins,
 			 char* m_help)
 {
@@ -24,6 +42,7 @@ Environment::Environment(int argc,
 #endif
 
   nspins = m_nspins;
+  disorder_flg = PETSC_FALSE;
     
   if (ierr != 0)
     throw std::runtime_error("Slepc was not correctly initialized\n");

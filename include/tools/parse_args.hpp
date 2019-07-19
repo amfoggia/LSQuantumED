@@ -10,173 +10,62 @@
 /* --------------------------------------------------------------------------- */
 
 // Macro to obtain command-line options for the Hamiltonian
-#ifdef DISORDER
 #define parse_args()							\
-  PetscReal J1 = 0.0;							\
-  PetscReal Delta1 = 0.0;						\
-  PetscReal J2 = 0.0;							\
-  PetscReal Delta2 = 0.0;						\
-  PetscInt rep = 1;							\
-  PetscReal min_dis = 0.0, max_dis = 0.0;				\
-  PetscBool check_arg_J = PETSC_FALSE,					\
-    check_arg_D = PETSC_FALSE,						\
-    check_arg_nn = PETSC_FALSE,						\
-    check_arg_nnn = PETSC_FALSE;					\
-  PetscBool reprod = PETSC_TRUE;					\
-  PetscBool check_arg_dis = PETSC_FALSE,				\
-    check_param_dis = PETSC_FALSE;					\
+  PetscInt  _n;								\
+  (env.nspins == 0) ? (_n = 6) : (_n = env.nspins);			\
+  PetscInt  lx        = 1;						\
+  PetscInt  ly        = _n;						\
+  PetscReal J1        = 1.0;						\
+  PetscReal Delta1    = 1.0;						\
+  PetscReal J2        = 0.0;						\
+  PetscReal Delta2    = 0.0;						\
+  PetscInt  rep       = 1;						\
+  PetscReal min_dis   = -0.3;						\
+  PetscReal max_dis   = 0.3;						\
+  PetscBool reprod    = PETSC_TRUE;					\
+  PetscBool check_dis = PETSC_FALSE;					\
+  PetscBool check_lattype = PETSC_FALSE;				\
+  lattice_type ltype  = lattice_type::chain1D;				\
+  const char * const LatTypes[] = {"chain1D", "square2D", "honeycomb2D", "lattice_type", "", 0}; \
 									\
-  ierr = PetscOptionsHasName(NULL, NULL, "-nn", &check_arg_nn); CHKERRQ(ierr); \
-  ierr = PetscOptionsHasName(NULL, NULL, "-nnn", &check_arg_nnn); CHKERRQ(ierr); \
-  ierr = PetscOptionsHasName(NULL, NULL, "-disorder", &check_arg_dis); CHKERRQ(ierr); \
 									\
-  if (!check_arg_nn && !check_arg_nnn && !check_arg_dis) {		\
-    ierr = PetscPrintf(PETSC_COMM_WORLD, "Need to provide at least one kind of interaction between spins:\n -nn: nearest neighbours\n -nnn: next-nearest neighbours\n -disorder: disorder\n"); CHKERRQ(ierr); \
-    return(1);								\
-  }									\
-  									\
-  /*									\
-  PetscInt  _latT, Lx, Ly; \
-  PetscBool check_arg_lat,					\
-    check_arg_lat_x,							\
-    check_arg_lat_y;							\
-  ierr = PetscOptionsHasName(NULL, NULL, "-lat", &check_arg_lat); CHKERRQ(ierr); \
-  if (!check_arg_lat) {							\
-    ierr = PetscPrintf(PETSC_COMM_WORLD, "Need to provide the lattice type with option -lat:\n <0> chain1D, <1> square2D \n"); \
-    return 1;								\
-  }									\
-  if (check_arg_lat) {							\
-    ierr = PetscOptionsGetInt(NULL, NULL, "-lat", &_latT, &check_arg_lat); CHKERRQ(ierr); \
-    if (_latT < 0 || _latT > 1) {					\
-      ierr = PetscPrintf(PETSC_COMM_WORLD, "The allowed options are:\n <0> chain1D, <1> square2D \n"); \
-      return 1;								\
+  ierr = PetscOptionsBegin(PETSC_COMM_WORLD, "", "Options for the spin system", ""); CHKERRQ(ierr); \
+  {									\
+    ierr = PetscOptionsInt("-n", "Number of spins in the system", "environment.hpp", _n, &_n, NULL); CHKERRQ(ierr); \
+    if (_n%2 != 0)							\
+      throw std::invalid_argument("The total number of spins has to be EVEN.");	\
+    if (_n <= 0)							\
+      throw std::invalid_argument("The total number of spins has to be POSITIVE."); \
+    env.nspins = _n;							\
+									\
+    ierr = PetscOptionsEnum("-ltype", "Type of lattice", "lattice.hpp", LatTypes, (PetscEnum)ltype, (PetscEnum*)&ltype, &check_lattype); CHKERRQ(ierr); \
+    if (ltype == lattice_type::chain1D) {				\
+      ierr = PetscOptionsReject(NULL, NULL, "-lx", "For chain1D lattice, one should not specify the dimension in each direction"); CHKERRQ(ierr); \
+      ierr = PetscOptionsReject(NULL, NULL, "-ly", "For chain1D lattice, one should not specify the dimension in each direction"); CHKERRQ(ierr); \
     }									\
-    if (_latT == 1) {							\
-      ierr = PetscOptionsHasName(NULL, NULL, "-Lx", &check_arg_lat_x); CHKERRQ(ierr); \
-      ierr = PetscOptionsHasName(NULL, NULL, "-Ly", &check_arg_lat_y); CHKERRQ(ierr); \
-      if (check_arg_lat_x && check_arg_lat_y) {				\
-	ierr = PetscOptionsGetInt(NULL, NULL, "-Lx", &Lx, &check_arg_lat_x); CHKERRQ(ierr); \
-	ierr = PetscOptionsGetInt(NULL, NULL, "-Ly", &Ly, &check_arg_lat_y); CHKERRQ(ierr); \
-      }									\
-      else {								\
-	ierr = PetscPrintf(PETSC_COMM_WORLD, "Need to provide the dimensions of the square lattice with -Lx and -Ly\n"); CHKERRQ(ierr); \
-	return 1;							\
-      }									\
+    else {								\
+      ierr = PetscOptionsInt("-lx", "Lattice dimention in x direction", "lattice.hpp", lx, &lx, NULL); CHKERRQ(ierr); \
+      ierr = PetscOptionsInt("-ly", "Lattice dimention in y direction", "lattice.hpp", ly, &ly, NULL); CHKERRQ(ierr); \
     }									\
   }									\
-  */									\
+  ierr = PetscOptionsEnd(); CHKERRQ(ierr);				\
+    									\
+  ierr = PetscOptionsBegin(PETSC_COMM_WORLD, "", "Options for the Hamiltonian", "hamiltonian.hpp"); CHKERRQ(ierr); \
+  {									\
+    ierr = PetscOptionsReal("-j1", "Nearest neighbours interaction", "Hamiltonian::build_off_diag", J1, &J1, NULL); CHKERRQ(ierr); \
+    ierr = PetscOptionsReal("-d1", "Nearest neighbours anisotropy", "Hamiltonian::build_diag", Delta1, &Delta1, NULL); CHKERRQ(ierr); \
+    ierr = PetscOptionsReal("-j2", "Next-nearest neighbours interaction", "Hamiltonian::build_off_diag", J2, &J2, NULL); CHKERRQ(ierr); \
+    ierr = PetscOptionsReal("-d2", "Next-nearest neighbours anisotropy", "Hamiltonian::build_diag", Delta2, &Delta2, NULL); CHKERRQ(ierr); \
 									\
-  if (check_arg_dis) {							\
-    ierr = PetscOptionsHasName(NULL, NULL, "-min_dis", &check_param_dis); CHKERRQ(ierr); \
-    if (check_param_dis)						\
-      ierr = PetscOptionsGetReal(NULL, NULL, "-min_dis", &min_dis, &check_param_dis); CHKERRQ(ierr); \
-    ierr = PetscOptionsHasName(NULL, NULL, "-max_dis", &check_param_dis); CHKERRQ(ierr); \
-    if (check_param_dis)						\
-      ierr = PetscOptionsGetReal(NULL, NULL, "-max_dis", &max_dis, &check_param_dis); CHKERRQ(ierr); \
-    ierr = PetscOptionsHasName(NULL, NULL, "-reprod", &check_param_dis); CHKERRQ(ierr); \
-    if (check_param_dis)						\
-      ierr = PetscOptionsGetBool(NULL, NULL, "-reprod", &reprod, &check_param_dis); CHKERRQ(ierr); \
-    ierr = PetscOptionsHasName(NULL, NULL, "-rep", &check_param_dis); CHKERRQ(ierr); \
-    if (check_param_dis)						\
-      ierr = PetscOptionsGetInt(NULL, NULL, "-rep", &rep, &check_param_dis); CHKERRQ(ierr); \
-  }									\
-									\
-  if (check_arg_nn) {							\
-    ierr = PetscOptionsHasName(NULL, NULL, "-J1", &check_arg_J); CHKERRQ(ierr); \
-    ierr = PetscOptionsHasName(NULL, NULL, "-D1", &check_arg_D); CHKERRQ(ierr); \
-    if (check_arg_J && check_arg_D) {					\
-      ierr = PetscOptionsGetReal(NULL, NULL, "-J1", &J1, &check_arg_J); CHKERRQ(ierr); \
-      ierr = PetscOptionsGetReal(NULL, NULL, "-D1", &Delta1, &check_arg_D); CHKERRQ(ierr); \
-    } else {								\
-      ierr = PetscPrintf(PETSC_COMM_WORLD, "Need to provide the value of the nearest neighbours interaction with option -J1 and anisotropy with option -D1\n"); CHKERRQ(ierr); \
-      return(1);							\
+    ierr = PetscOptionsName("-disorder", "Specify if you want to run with disorder average", "Hamiltonian::build_disorder", &check_dis); CHKERRQ(ierr); \
+    if (check_dis) {							\
+      env.disorder_flg = PETSC_TRUE;					\
+      ierr = PetscOptionsReal("-min_dis", "Minimum value for random disorder variable", "Tools::RandomDisorder", min_dis, &min_dis, NULL); CHKERRQ(ierr); \
+      ierr = PetscOptionsReal("-max_dis", "Maximum value for random disorder variable", "Tools::RandomDisorder", max_dis, &max_dis, NULL); CHKERRQ(ierr); \
+      ierr = PetscOptionsInt("-rep", "Number of disorder repetitions", "Tools::RandomDisorder", rep, &rep, NULL); CHKERRQ(ierr); \
+      ierr = PetscOptionsBool("-reprod", "Specify if you want that the disorder random values are reproducible or not", "Tools::RandomDisorder", reprod, &reprod, NULL); CHKERRQ(ierr); \
     }									\
   }									\
-  									\
-  if (check_arg_nnn) {							\
-    ierr = PetscOptionsHasName(NULL, NULL, "-J2", &check_arg_J); CHKERRQ(ierr); \
-    ierr = PetscOptionsHasName(NULL, NULL, "-D2", &check_arg_D); CHKERRQ(ierr); \
-    if (check_arg_J && check_arg_D) {					\
-      ierr = PetscOptionsGetReal(NULL, NULL, "-J2", &J2, &check_arg_J); CHKERRQ(ierr); \
-      ierr = PetscOptionsGetReal(NULL, NULL, "-D2", &Delta2, &check_arg_D); CHKERRQ(ierr); \
-    } else {								\
-      ierr = PetscPrintf(PETSC_COMM_WORLD, "Need to provide the value of the next-nearest neighbours interaction with option -J2 and anisotropy with option -D2\n"); CHKERRQ(ierr); \
-      return(1);							\
-    }									\
-  }
-#else
-#define parse_args()							\
-  PetscReal J1 = 0.0;							\
-  PetscReal Delta1 = 0.0;						\
-  PetscReal J2 = 0.0;							\
-  PetscReal Delta2 = 0.0;						\
-  PetscBool check_arg_J = PETSC_FALSE,					\
-    check_arg_D = PETSC_FALSE,						\
-    check_arg_nn = PETSC_FALSE,						\
-    check_arg_nnn = PETSC_FALSE;					\
-									\
-  ierr = PetscOptionsHasName(NULL, NULL, "-nn", &check_arg_nn); CHKERRQ(ierr); \
-  ierr = PetscOptionsHasName(NULL, NULL, "-nnn", &check_arg_nnn); CHKERRQ(ierr); \
-  									\
-  if (!check_arg_nn && !check_arg_nnn) {				\
-    ierr = PetscPrintf(PETSC_COMM_WORLD, "Need to provide at least one kind of interaction between spins:\n -nn: nearest neighbours\n -nnn: next-nearest neighbours\n"); CHKERRQ(ierr); \
-    return(1);								\
-  }									\
-									\
-  /*									\
-  PetscInt  _latT, Lx, Ly;						\
-  PetscBool check_arg_lat,						\
-  check_arg_lat_x,							\
-  check_arg_lat_y;							\
-  ierr = PetscOptionsHasName(NULL, NULL, "-lat", &check_arg_lat); CHKERRQ(ierr); \
-  if (!check_arg_lat) {							\
-    ierr = PetscPrintf(PETSC_COMM_WORLD, "Need to provide the lattice type with option -lat:\n <0> chain1D, <1> square2D \n"); \
-    return 1;								\
-  }									\
-    if (check_arg_lat) {						\
-      ierr = PetscOptionsGetInt(NULL, NULL, "-lat", &_latT, &check_arg_lat); CHKERRQ(ierr); \
-      if (_latT < 0 || _latT > 1) {					\
-	ierr = PetscPrintf(PETSC_COMM_WORLD, "The allowed options are:\n <0> chain1D, <1> square2D \n"); \
-	return 1;							\
-      }									\
-      if (_latT == 1) {							\
-	ierr = PetscOptionsHasName(NULL, NULL, "-Lx", &check_arg_lat_x); CHKERRQ(ierr); \
-	ierr = PetscOptionsHasName(NULL, NULL, "-Ly", &check_arg_lat_y); CHKERRQ(ierr); \
-	if (check_arg_lat_x && check_arg_lat_y) {			\
-	  ierr = PetscOptionsGetInt(NULL, NULL, "-Lx", &Lx, &check_arg_lat_x); CHKERRQ(ierr); \
-	  ierr = PetscOptionsGetInt(NULL, NULL, "-Ly", &Ly, &check_arg_lat_y); CHKERRQ(ierr); \
-	}								\
-	else {								\
-	  ierr = PetscPrintf(PETSC_COMM_WORLD, "Need to provide the dimensions of the square lattice with -Lx and -Ly\n"); CHKERRQ(ierr); \
-	  return 1;							\
-	}								\
-      }									\
-    }									\
-*/									\
-									\
-  if (check_arg_nn) {							\
-    ierr = PetscOptionsHasName(NULL, NULL, "-J1", &check_arg_J); CHKERRQ(ierr); \
-    ierr = PetscOptionsHasName(NULL, NULL, "-D1", &check_arg_D); CHKERRQ(ierr); \
-    if (check_arg_J && check_arg_D) {					\
-      ierr = PetscOptionsGetReal(NULL, NULL, "-J1", &J1, &check_arg_J); CHKERRQ(ierr); \
-      ierr = PetscOptionsGetReal(NULL, NULL, "-D1", &Delta1, &check_arg_D); CHKERRQ(ierr); \
-    } else {								\
-      ierr = PetscPrintf(PETSC_COMM_WORLD, "Need to provide the value of the nearest neighbours interaction with option -J1 and anisotropy with option -D1\n"); CHKERRQ(ierr); \
-      return(1);							\
-    }									\
-  }									\
-  									\
-  if (check_arg_nnn) {							\
-    ierr = PetscOptionsHasName(NULL, NULL, "-J2", &check_arg_J); CHKERRQ(ierr); \
-    ierr = PetscOptionsHasName(NULL, NULL, "-D2", &check_arg_D); CHKERRQ(ierr); \
-    if (check_arg_J && check_arg_D) {					\
-      ierr = PetscOptionsGetReal(NULL, NULL, "-J2", &J2, &check_arg_J); CHKERRQ(ierr); \
-      ierr = PetscOptionsGetReal(NULL, NULL, "-D2", &Delta2, &check_arg_D); CHKERRQ(ierr); \
-    } else {								\
-      ierr = PetscPrintf(PETSC_COMM_WORLD, "Need to provide the value of the next-nearest neighbours interaction with option -J2 and anisotropy with option -D2\n"); CHKERRQ(ierr); \
-      return(1);							\
-    }									\
-  }
-#endif
+  ierr = PetscOptionsEnd(); CHKERRQ(ierr);				\
 
 #endif

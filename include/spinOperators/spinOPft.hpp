@@ -15,8 +15,6 @@ struct Sq_data {
   Basis* b0; /**< Basis of the Mag = 0 subspace. */
   Basis* b1; /**< Basis of the new subspace. */
   L* lat; /**< Lattice object. */
-  // TODO: qi should be templated on the dimension of the lattice (1D, 2D, 3D)
-  std::array<PetscReal,2> qi; /**< Value of q to use. */
 };
 
 /* --------------------------------------------------------------------------- */
@@ -34,24 +32,26 @@ class Sq {
 public:
 
   /**
-   * @fn OpOnBasisElems(Environment&, PetscInt, PetscInt, PetscInt)
+   * @fn OpOnBasisElems(Environment&, PetscInt, PetscInt, PetscInt, PetscInt)
    * @brief Computes the operators applied on the basis elements.
    * Each particular correlation (derived classes) will compute it in a different way.
    * This is what a user should provide if it were to add a new correlation function.
    * @param[in] env Environment object.
    * @param[inout] basis_elem Element of basis to which one applies the operator.
+   * @param[in] spin Lattice site to which the operator is applied.
    */
-  virtual void OpOnBasisElems(Environment& env, PetscInt basis_elem) = 0;
+  virtual void OpOnBasisElems(Environment& env, PetscInt basis_elem, PetscInt spin) = 0;
 
   /**
-   * @fn OpOnStateVector(Environment&, Vec&, Vec&)
+   * @fn OpOnStateVector(Environment&, Vec&, Vec&, PetscInt)
    * @brief Computes the operator applied to a state vector (linear combination of basis elements).
    * @param[in] env Environment object.
    * @param[in] state State vector to which one applies the operator.
    * @param[inout] rhs Vector obtained after applying the operator on the right hand side vector.
+   * @param[in] spin Lattice site to which the operator is applied.
    * @return Error value.
    */
-  virtual PetscErrorCode OpOnStateVector(Environment& env, Vec& state, Vec& rhs) = 0;
+  virtual PetscErrorCode OpOnStateVector(Environment& env, Vec& state, Vec& rhs, PetscInt spin) = 0;
 
    /**
    * @fn ~Sq
@@ -89,7 +89,7 @@ private:
 #ifdef DEVEL
 public:
 #endif
-  PetscScalar value; /**< Coefficient obtained after applying the operator to a basis element. */
+  PetscReal value; /**< Coefficient obtained after applying the operator to a basis element. */
   
 public:
 
@@ -101,9 +101,9 @@ public:
    */
   Sqz(Environment& m_env, Sq_data<L>& m_data);
 
-  void OpOnBasisElems(Environment& env, PetscInt basis_elem);
+  void OpOnBasisElems(Environment& env, PetscInt basis_elem, PetscInt spin);
 
-  PetscErrorCode OpOnStateVector(Environment& env, Vec& state, Vec& rhs);
+  PetscErrorCode OpOnStateVector(Environment& env, Vec& state, Vec& rhs, PetscInt spin);
 
   ~Sqz() {}
 };

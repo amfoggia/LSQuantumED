@@ -1,3 +1,4 @@
 option('DEVEL', type: 'boolean', value: 'false', description: 'Compiles the "bit_basis".')
 option('TIME_CODE', type: 'boolean', value: 'false', description: 'Activates the calls to the timing functions.')
-option('DISORDER', type: 'boolean', value: 'false', description: 'Allows one to run the code with a disorder term in the Hamiltonian.')
+option('BUILD_TEST', type: 'boolean', value: 'false', description: 'Compiles the tests.')
+option('boostdir', type: 'string', value: 'BOOST_INC', description: 'Include path for Boost library.')

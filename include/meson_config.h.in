@@ -5,6 +5,7 @@
 
 #mesondefine DEVEL
 #mesondefine TIME_CODE
-#mesondefine DISORDER
+#mesondefine BUILD_TEST
+#mesondefine boostdir
 
 #endif
