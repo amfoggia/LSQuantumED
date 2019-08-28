@@ -18,11 +18,19 @@ TEST(LatticeTest, NumNeighbours) {
   square2D l2{env,4,3};
   square2D l3{env,6,2};
   chain1D l4{env};
+  honeycomb2D l5{env,2,6};
 
-  EXPECT_EQ(1,l1.num_neighbours());
-  EXPECT_EQ(2,l2.num_neighbours());
-  EXPECT_EQ(2,l3.num_neighbours());
-  EXPECT_EQ(1,l4.num_neighbours());
+  EXPECT_EQ(1,l1.num_nn());
+  EXPECT_EQ(2,l2.num_nn());
+  EXPECT_EQ(2,l3.num_nn());
+  EXPECT_EQ(1,l4.num_nn());
+  EXPECT_EQ(2,l5.num_nn());
+
+  EXPECT_EQ(1,l1.num_nnn());
+  EXPECT_EQ(2,l2.num_nnn());
+  EXPECT_EQ(2,l3.num_nnn());
+  EXPECT_EQ(1,l4.num_nnn());
+  EXPECT_EQ(3,l5.num_nnn());
 }
 
 int main(int argc, char* argv[]) {

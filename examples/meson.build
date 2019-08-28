@@ -11,8 +11,7 @@ examples_src = [env,
 	       solver,
 	       rand_dis,
 	       time,
-	       correl,
-	       phys]
+	       correl]
 
 exec_main_NO_dis = executable('main_NO_disorder.x',
                              ['main_NO_disorder.cpp', examples_src],
@@ -39,6 +38,37 @@ exec_main = executable('main.x',
 		      install: true,
 		      install_dir: 'examples')
 
+exec_ex1 = executable('ex1.x',
+                     ['ex1.cpp', examples_src],
+                     include_directories: inc,
+	             cpp_args: ['-I'+boost],
+                     dependencies: [slepc_dep, mpi_dep],
+	             install: true,
+	             install_dir: 'examples')
+
+exec_ex2 = executable('ex2.x',
+                     ['ex2.cpp', examples_src],
+                     include_directories: inc,
+	             cpp_args: ['-I'+boost],
+                     dependencies: [slepc_dep, mpi_dep],
+	             install: true,
+	             install_dir: 'examples')
+
+exec_ex3 = executable('ex3.x',
+                     ['ex3.cpp', examples_src],
+                     include_directories: inc,
+	             cpp_args: ['-I'+boost],
+                     dependencies: [slepc_dep, mpi_dep],
+	             install: true,
+	             install_dir: 'examples')
+
+exec_ex4 = executable('ex4.x',
+                     ['ex4.cpp', examples_src],
+                     include_directories: inc,
+	             cpp_args: ['-I'+boost],
+                     dependencies: [slepc_dep, mpi_dep],
+	             install: true,
+	             install_dir: 'examples')
 
 mpiexec = find_program('mpiexec')
 

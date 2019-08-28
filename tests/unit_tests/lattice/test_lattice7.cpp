@@ -18,6 +18,7 @@ TEST(LatticeTest, GetNeighbours2Dsquare2) {
 
   // Nearest neighbours
   EXPECT_EQ(36,l2.nn.size());
+  EXPECT_EQ(12,l2.nnXsite.size());
   
   EXPECT_EQ(0,l2.nn[0]);
   EXPECT_EQ(1,l2.nn[1]);
@@ -67,8 +68,12 @@ TEST(LatticeTest, GetNeighbours2Dsquare2) {
   EXPECT_EQ(8,l2.nn[34]);
   EXPECT_EQ(3,l2.nn[35]);
 
+  for (PetscInt i = 0; i < env.nspins; ++i)
+    EXPECT_EQ(2,l2.num_nnXsite(i));
+
   // Next-nearest neighbours
   EXPECT_EQ(36,l2.nnn.size());
+  EXPECT_EQ(12,l2.nnnXsite.size());
   
   EXPECT_EQ(0,l2.nnn[0]);
   EXPECT_EQ(5,l2.nnn[1]);
@@ -118,34 +123,8 @@ TEST(LatticeTest, GetNeighbours2Dsquare2) {
   EXPECT_EQ(0,l2.nnn[34]);
   EXPECT_EQ(2,l2.nnn[35]);
 
-  // Distance vector
-  EXPECT_EQ(12,l2.r.size());
-  
-  EXPECT_EQ(0,l2.r[0][0]);
-  EXPECT_EQ(0,l2.r[1][0]);
-  EXPECT_EQ(0,l2.r[2][0]);
-  EXPECT_EQ(0,l2.r[3][0]);
-  EXPECT_EQ(1,l2.r[4][0]);
-  EXPECT_EQ(1,l2.r[5][0]);
-  EXPECT_EQ(1,l2.r[6][0]);
-  EXPECT_EQ(1,l2.r[7][0]);
-  EXPECT_EQ(2,l2.r[8][0]);
-  EXPECT_EQ(2,l2.r[9][0]);
-  EXPECT_EQ(2,l2.r[10][0]);
-  EXPECT_EQ(2,l2.r[11][0]);
-
-  EXPECT_EQ(0,l2.r[0][1]);
-  EXPECT_EQ(1,l2.r[1][1]);
-  EXPECT_EQ(2,l2.r[2][1]);
-  EXPECT_EQ(3,l2.r[3][1]);
-  EXPECT_EQ(0,l2.r[4][1]);
-  EXPECT_EQ(1,l2.r[5][1]);
-  EXPECT_EQ(2,l2.r[6][1]);
-  EXPECT_EQ(3,l2.r[7][1]);
-  EXPECT_EQ(0,l2.r[8][1]);
-  EXPECT_EQ(1,l2.r[9][1]);
-  EXPECT_EQ(2,l2.r[10][1]);
-  EXPECT_EQ(3,l2.r[11][1]);
+  for (PetscInt i = 0; i < env.nspins; ++i)
+    EXPECT_EQ(2,l2.num_nnnXsite(i));
 }
 
 int main(int argc, char* argv[]) {

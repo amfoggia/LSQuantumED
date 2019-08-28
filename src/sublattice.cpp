@@ -3,127 +3,160 @@
 /* --------------------------------------------------------------------------- */
 
 template<>
-std::array<std::vector<PetscInt>,2> AF<2,chain1D>::construct_sublat() {
+std::vector<std::vector<PetscInt>> AF<chain1D>::construct_sublat() {
 
-  std::array<std::vector<PetscInt>,2> sublat;
+  std::vector<std::vector<PetscInt>> sublat;
+
+  for (PetscInt s = 0; s < size; ++s)
+    sublat.push_back(std::vector<PetscInt>{});
   
   for (PetscInt i = 0; i < nspins; ++i) 
     sublat[(i%2) ? 1 : 0].push_back(i);
   return sublat; 
 }
 
+template<>
+AF<chain1D>::AF(chain1D& m_lattice,
+		PetscInt m_size)
+  : Sublattice<chain1D>{m_lattice},
+  nspins{m_lattice.num_spins()},
+  size{2}
+  {sublat = construct_sublat();}
+
 /* --------------------------------------------------------------------------- */
 
 template<>
-std::array<std::vector<PetscInt>,2> AF<2,square2D>::construct_sublat() {
+std::vector<std::vector<PetscInt>> AF<square2D>::construct_sublat() {
 
-  std::array<std::vector<PetscInt>,2> sublat;
-  std::vector<std::pair<PetscBool,short int>> tagged;
-  short int current = 0, nn;
-  PetscInt offset, spin;
-
-  // Initialize tagged
-  for (PetscInt i = 0; i < nspins; ++i)
-    //    tagged.push_back(std::pair{PETSC_FALSE,0});
-    tagged.push_back(std::pair<PetscBool,short int>{PETSC_FALSE,0});
+  std::vector<std::vector<PetscInt>> sublat;
+  short int tagx, tagy;
+  PetscInt current;
   
+  for (PetscInt s = 0; s < size; ++s)
+    sublat.push_back(std::vector<PetscInt>{});
 
-  // Separate spins in sublattices
-  for (PetscInt i = 0; i < nspins; ++i) {
-
-    if (tagged[i].first == PETSC_FALSE) {
-      tagged[i].first = PETSC_TRUE;
-      tagged[i].second = current;
+  tagx = 0;
+  for (PetscInt ix = 0; ix < this->lattice.nspins_x; ++ix) {
+    tagy = tagx;
+    for (PetscInt iy = 0; iy < this->lattice.nspins_y; ++iy) {
+      current = ix * this->lattice.nspins_y + iy;
+      sublat[(tagy%2) ? 1 : 0].push_back(current);
+      tagy ^= 1;
     }
-    else
-      current = tagged[i].second;
-
-    nn = current ^ 1;
-
-    offset = (this->lattice.num_neighbours() + 1) * i;
-    for (PetscInt j = 0; j < this->lattice.num_neighbours(); ++j) {
-      spin = this->lattice.nn[offset + j + 1];
-      tagged[spin].first = PETSC_TRUE;
-      tagged[spin].second = nn;
-    }
+    tagx ^= 1;
   }
-
-  // Fill in the sublattices
-  for (PetscInt i = 0; i < nspins; ++ i) {
-    if (tagged[i].second == 0)
-      sublat[0].push_back(i);
-    else
-      sublat[1].push_back(i);
-  } 
   return sublat;
 }
+
+template<>
+AF<square2D>::AF(square2D& m_lattice,
+		 PetscInt m_size)
+  : Sublattice<square2D>{m_lattice},
+  nspins{m_lattice.num_spins()},
+  size{2}
+  {sublat = construct_sublat();}
 
 /* --------------------------------------------------------------------------- */
 
 template<>
-std::array<std::vector<PetscInt>,4> Striped<4,square2D>::construct_sublat() {
+std::vector<std::vector<PetscInt>> Striped<square2D>::construct_sublat() {
 
-  std::array<std::vector<PetscInt>,4> sublat;
-  std::vector<std::pair<PetscBool,short int>> tagged;
-  short int current;
-  PetscInt neighA, neighB;
-  PetscInt ix1,iy1;
-  int current_spin;
+  std::vector<std::vector<PetscInt>> sublat;
+  PetscInt current;
+  short int tagx, tagy;
+  
+  for (PetscInt s = 0; s < size; ++s)
+    sublat.push_back(std::vector<PetscInt>{});
 
-  // First pair of sublattices ----------------------------------
-  // Initialize tagged
-  for (PetscInt i = 0; i < nspins; ++i)
-    //    tagged.push_back(std::pair{PETSC_FALSE,0});
-    tagged.push_back(std::pair<PetscBool,short int>{PETSC_FALSE,0});
-
-  for (PetscInt ix = 0; ix < this->lattice.nspins_x; ++ix)
+  tagx = 0;
+  for (PetscInt ix = 0; ix < this->lattice.nspins_x; ++ix) {
+    tagy = 0;
     for (PetscInt iy = 0; iy < this->lattice.nspins_y; ++iy) {
-      current_spin = ix * this->lattice.nspins_y + iy;
-      current = tagged[current_spin].second;
-
-      iy1 = (iy+1)%this->lattice.nspins_y;
-      neighA = ix * this->lattice.nspins_y + iy1;
-      tagged[neighA].second = current ^ 1u;
-
-      ix1 = (ix+1)%this->lattice.nspins_x;
-      neighB = ix1 * this->lattice.nspins_y + iy;
-      tagged[neighB].second = current;
+      current = ix * this->lattice.nspins_y + iy;
+      sublat[(tagy%2) ? 1 : 0].push_back(current);
+      sublat[(tagx%2) ? 3 : 2].push_back(current);
+      tagy ^= 1;
     }
-
-  // Fill in the sublattices
-  for (PetscInt i = 0; i < nspins; ++ i) {
-    if (tagged[i].second == 0)
-      sublat[0].push_back(i);
-    else
-      sublat[1].push_back(i);
-  }
-
-  // Second pair of sublattices ----------------------------------
-  // Initialize tagged
-  for (PetscInt i = 0; i < nspins; ++i)
-    //    tagged.push_back(std::pair{PETSC_FALSE,0});
-    tagged.push_back(std::pair<PetscBool,short int>{PETSC_FALSE,0});
-
-  for (PetscInt ix = 0; ix < this->lattice.nspins_x; ++ix)
-    for (PetscInt iy = 0; iy < this->lattice.nspins_y; ++iy) {
-      current_spin = ix * this->lattice.nspins_y + iy;
-      current = tagged[current_spin].second;
-
-      iy1 = (iy+1)%this->lattice.nspins_y;
-      neighA = ix * this->lattice.nspins_y + iy1;
-      tagged[neighA].second = current;
-
-      ix1 = (ix+1)%this->lattice.nspins_x;
-      neighB = ix1 * this->lattice.nspins_y + iy;
-      tagged[neighB].second = current ^ 1u;
-    }
-
-  // Fill in the sublattices
-  for (PetscInt i = 0; i < nspins; ++ i) {
-    if (tagged[i].second == 0)
-      sublat[2].push_back(i);
-    else
-      sublat[3].push_back(i);
+    tagx ^= 1;
   }
   return sublat;
 }
+
+template<>
+Striped<square2D>::Striped(square2D& m_lattice,
+			   PetscInt m_size)
+  : Sublattice<square2D>{m_lattice},
+  nspins{m_lattice.nspins},
+  size{4}
+{sublat = construct_sublat();}
+
+/* --------------------------------------------------------------------------- */
+
+template<>
+std::vector<std::vector<PetscInt>> AF<honeycomb2D>::construct_sublat() {
+
+  std::vector<std::vector<PetscInt>> sublat;
+  short int tagx, tagy;
+  PetscInt current;
+  
+  for (PetscInt s = 0; s < size; ++s)
+    sublat.push_back(std::vector<PetscInt>{});
+
+  tagx = 0;
+  for (PetscInt ix = 0; ix < this->lattice.nspins_x; ++ix) {
+    tagy = tagx;
+    for (PetscInt iy = 0; iy < this->lattice.nspins_y; ++iy) {
+      current = ix * this->lattice.nspins_y + iy;
+      sublat[(tagy%2) ? 1 : 0].push_back(current);
+      tagy ^= 1;
+    }
+    tagx ^= 1;
+  }
+  return sublat;
+}
+
+template<>
+AF<honeycomb2D>::AF(honeycomb2D& m_lattice,
+		    PetscInt m_size)
+  : Sublattice<honeycomb2D>{m_lattice},
+  nspins{m_lattice.num_spins()},
+  size{2}
+  {sublat = construct_sublat();}
+
+/* --------------------------------------------------------------------------- */
+
+template<>
+std::vector<std::vector<PetscInt>> Striped<honeycomb2D>::construct_sublat() {
+
+  std::vector<std::vector<PetscInt>> sublat;
+  PetscInt current;
+  short int tagx, tagy;
+  
+  for (PetscInt s = 0; s < size; ++s)
+    sublat.push_back(std::vector<PetscInt>{});
+
+  tagx = 0;
+  for (PetscInt ix = 0; ix < this->lattice.nspins_x; ++ix) {
+    tagy = 0;
+    for (PetscInt iy = 0; iy < this->lattice.nspins_y; ++iy) {
+      current = ix * this->lattice.nspins_y + iy;
+      sublat[(tagy%2) ? 1 : 0].push_back(current);
+      tagy ^= 1;
+    }
+  }
+
+  /* MISSING THE OTHER FOUR SUBLATTICES.
+     THE DIMENSIONS SHOULD BE MULTIPLE OF 4, IF NOT
+     PERIODIC BOUNDARY CONDITIONS ARE NOT SATISFIED.
+   */
+  
+  return sublat;
+}
+
+template<>
+Striped<honeycomb2D>::Striped(honeycomb2D& m_lattice,
+			      PetscInt m_size)
+  : Sublattice<honeycomb2D>{m_lattice},
+  nspins{m_lattice.nspins},
+  size{6}
+{sublat = construct_sublat();}

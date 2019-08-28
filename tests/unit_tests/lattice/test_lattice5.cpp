@@ -18,6 +18,7 @@ TEST(LatticeTest, GetNeighbours1dchain2) {
 
   // Nearest neighbours
   EXPECT_EQ(8,l1.nn.size());
+  EXPECT_EQ(4,l1.nnXsite.size());
   
   EXPECT_EQ(0,l1.nn[0]);
   EXPECT_EQ(1,l1.nn[1]);
@@ -31,8 +32,14 @@ TEST(LatticeTest, GetNeighbours1dchain2) {
   EXPECT_EQ(3,l1.nn[6]);
   EXPECT_EQ(0,l1.nn[7]);
 
+  EXPECT_EQ(1,l1.num_nnXsite(0));
+  EXPECT_EQ(1,l1.num_nnXsite(1));
+  EXPECT_EQ(1,l1.num_nnXsite(2));
+  EXPECT_EQ(1,l1.num_nnXsite(3));
+
   // Next-nearest neighbours
   ASSERT_EQ(8,l1.nnn.size());
+  EXPECT_EQ(4,l1.nnnXsite.size());
 
   EXPECT_EQ(0,l1.nnn[0]);
   EXPECT_EQ(2,l1.nnn[1]);
@@ -46,18 +53,10 @@ TEST(LatticeTest, GetNeighbours1dchain2) {
   EXPECT_EQ(3,l1.nnn[6]);
   EXPECT_EQ(1,l1.nnn[7]);
 
-  // Distance vector
-  ASSERT_EQ(4,l1.r.size());
-
-  EXPECT_EQ(0,l1.r[0][0]);
-  EXPECT_EQ(1,l1.r[1][0]);
-  EXPECT_EQ(2,l1.r[2][0]);
-  EXPECT_EQ(3,l1.r[3][0]);
-
-  EXPECT_EQ(0,l1.r[0][1]);
-  EXPECT_EQ(0,l1.r[1][1]);
-  EXPECT_EQ(0,l1.r[2][1]);
-  EXPECT_EQ(0,l1.r[3][1]);
+  EXPECT_EQ(1,l1.num_nnnXsite(0));
+  EXPECT_EQ(1,l1.num_nnnXsite(1));
+  EXPECT_EQ(1,l1.num_nnnXsite(2));
+  EXPECT_EQ(1,l1.num_nnnXsite(3));
 }
 
 int main(int argc, char* argv[]) {

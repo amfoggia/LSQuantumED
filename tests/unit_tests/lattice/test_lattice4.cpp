@@ -15,7 +15,10 @@ TEST(LatticeTest, GetNeighbours1dchain1) {
   Environment env{_argc,_argv,6,help};
   
   chain1D l1{env};
+
+  // Nearest neighbours
   EXPECT_EQ(12,l1.nn.size());
+  EXPECT_EQ(6,l1.nnXsite.size());
   
   EXPECT_EQ(0,l1.nn[0]);
   EXPECT_EQ(1,l1.nn[1]);
@@ -35,39 +38,41 @@ TEST(LatticeTest, GetNeighbours1dchain1) {
   EXPECT_EQ(5,l1.nn[10]);
   EXPECT_EQ(0,l1.nn[11]);
 
-  // Distance vector
-  EXPECT_EQ(6,l1.r.size());
+  EXPECT_EQ(1,l1.num_nnXsite(0));
+  EXPECT_EQ(1,l1.num_nnXsite(1));
+  EXPECT_EQ(1,l1.num_nnXsite(2));
+  EXPECT_EQ(1,l1.num_nnXsite(3));
+  EXPECT_EQ(1,l1.num_nnXsite(4));
+  EXPECT_EQ(1,l1.num_nnXsite(5));
+
+  // Next-nearest neighbours
+  EXPECT_EQ(12,l1.nnn.size());
+  EXPECT_EQ(6,l1.nnnXsite.size());
   
-  EXPECT_EQ(0,l1.r[0][0]);
-  EXPECT_EQ(1,l1.r[1][0]);
-  EXPECT_EQ(2,l1.r[2][0]);
-  EXPECT_EQ(3,l1.r[3][0]);
-  EXPECT_EQ(4,l1.r[4][0]);
-  EXPECT_EQ(5,l1.r[5][0]);
+  EXPECT_EQ(0,l1.nnn[0]);
+  EXPECT_EQ(2,l1.nnn[1]);
 
-  EXPECT_EQ(0,l1.r[0][1]);
-  EXPECT_EQ(0,l1.r[1][1]);
-  EXPECT_EQ(0,l1.r[2][1]);
-  EXPECT_EQ(0,l1.r[3][1]);
-  EXPECT_EQ(0,l1.r[4][1]);
-  EXPECT_EQ(0,l1.r[5][1]);
+  EXPECT_EQ(1,l1.nnn[2]);
+  EXPECT_EQ(3,l1.nnn[3]);
 
-  // Lattice vector
-  EXPECT_EQ(6,l1.q.size());
-  
-  EXPECT_NEAR(0.0,l1.get_q(0)[0],1e-13);
-  EXPECT_NEAR(1.0471975511965976,l1.get_q(1)[0],1e-13);
-  EXPECT_NEAR(2.0943951023931953,l1.get_q(2)[0],1e-13);
-  EXPECT_NEAR(3.1415926535897931,l1.get_q(3)[0],1e-13);
-  EXPECT_NEAR(4.1887902047863905,l1.get_q(4)[0],1e-13);
-  EXPECT_NEAR(5.2359877559829879,l1.get_q(5)[0],1e-13);
+  EXPECT_EQ(2,l1.nnn[4]);
+  EXPECT_EQ(4,l1.nnn[5]);
 
-  EXPECT_NEAR(0,l1.get_q(0)[1],1e-13);
-  EXPECT_NEAR(0,l1.get_q(1)[1],1e-13);
-  EXPECT_NEAR(0,l1.get_q(2)[1],1e-13);
-  EXPECT_NEAR(0,l1.get_q(3)[1],1e-13);
-  EXPECT_NEAR(0,l1.get_q(4)[1],1e-13);
-  EXPECT_NEAR(0,l1.get_q(5)[1],1e-13);
+  EXPECT_EQ(3,l1.nnn[6]);
+  EXPECT_EQ(5,l1.nnn[7]);
+
+  EXPECT_EQ(4,l1.nnn[8]);
+  EXPECT_EQ(0,l1.nnn[9]);
+
+  EXPECT_EQ(5,l1.nnn[10]);
+  EXPECT_EQ(1,l1.nnn[11]);
+
+  EXPECT_EQ(1,l1.num_nnnXsite(0));
+  EXPECT_EQ(1,l1.num_nnnXsite(1));
+  EXPECT_EQ(1,l1.num_nnnXsite(2));
+  EXPECT_EQ(1,l1.num_nnnXsite(3));
+  EXPECT_EQ(1,l1.num_nnnXsite(4));
+  EXPECT_EQ(1,l1.num_nnnXsite(5));
 }
 
 int main(int argc, char* argv[]) {

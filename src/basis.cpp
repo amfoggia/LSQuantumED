@@ -73,8 +73,7 @@ Basis::Basis(Environment& env, PetscInt m_total_mag)
 
     // Special case: there's not enough elems to split in processes
     if (size < mpi_size)
-      throw std::invalid_argument("The size of the basis has to be at least equal to the number \
-                                 of MPI processes used.");
+      throw std::invalid_argument("The size of the basis has to be at least equal to the number of MPI processes used.");
 
     PetscInt rest = size%mpi_size;
     local_size = size/mpi_size + (rest > mpi_rank);
@@ -203,13 +202,6 @@ std::vector<PetscInt>& Basis::generate_int_basis() {
   // each process: local_smallest_int
   local_smallest_int = BasisHelper::search_elem(global_start_index, nspins, nspins_up);
   
-  // for (PetscInt i = 0; i < global_start_index; ++i) {
-  //   PetscInt u = smallest_int & -smallest_int;
-  //   PetscInt v = u + smallest_int;
-  //   smallest_int = (((v^smallest_int)/u)>>2) + v;
-  // }
-  // local_smallest_int = smallest_int;
-
   // Generate the basis with Gosper's hack
   PetscInt elem = local_smallest_int;
   int_basis.push_back(elem);

@@ -16,6 +16,7 @@ int main(int argc, char ** argv) {
   square2D lat{env,3,4};
   Hamiltonian<square2D> h{env,b,lat,J1,Delta1,J2,Delta2};
   PetscErrorCode ierr = 0;
+  env.disorder_flg = PETSC_TRUE;
 
   PetscReal * hi;
   PetscCalloc1(env.nspins, &hi);

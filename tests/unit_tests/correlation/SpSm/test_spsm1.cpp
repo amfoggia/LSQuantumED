@@ -46,14 +46,9 @@ TEST(SpSmCorrelation, chain1D) {
   ierr = h.build_diag(env); ASSERT_EQ(0,ierr);
   ierr = h.build_off_diag(env); ASSERT_EQ(0,ierr);
 
-#ifdef DISORDER
-  ierr = MatAssemblyBegin(h.hamilt,MAT_FINAL_ASSEMBLY); ASSERT_EQ(0,ierr);
-  ierr = MatAssemblyEnd(h.hamilt,MAT_FINAL_ASSEMBLY); ASSERT_EQ(0,ierr);
-#endif
-  
   EXPECT_EQ(0,Solver::SolverInit(solver,h.hamilt,1));
  
-  ierr = Solver::solve_lanczos(env,solver,nconv); EXPECT_EQ(0,ierr);
+  ierr = Solver::solve(env,solver,nconv); EXPECT_EQ(0,ierr);
 
   Vec xr;
   ierr = MatCreateVecs(h.hamilt,NULL,&xr); EXPECT_EQ(0,ierr);

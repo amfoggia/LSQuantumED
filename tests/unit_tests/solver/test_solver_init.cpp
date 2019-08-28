@@ -12,7 +12,7 @@ static char help[] = "This is a test to test the Solver namespace\n\n";
 int _argc;
 char ** _argv;
 
-Environment env{_argc,_argv,6,help};
+Environment env{_argc,_argv,help};
 
 class HamiltonianTestEnv : public ::testing::Environment {
 protected:
@@ -28,6 +28,7 @@ TEST(HamiltonianTest, SolverInit) {
   PetscReal Delta1 = 1.0;
   PetscReal J2 = 0.0;
   PetscReal Delta2 = 0.0;
+  env.nspins = 6;
   Basis b{env,0};
   chain1D lat{env};
   Hamiltonian<chain1D> h{env,b,lat,J1,Delta1,J2,Delta2};

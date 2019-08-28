@@ -145,73 +145,69 @@ PetscErrorCode Hamiltonian<L>::build_diag(Environment& env) {
       return(ierr);
     }
 
-    else {
-
-      // Construct nearest neighbours diagonal
-      if (std::fabs(Delta1) >= 1e-14) {
-	for (PetscInt i = Istart; i < Iend; ++i) {
-	  local_index = i - basis.global_start_index;
+    // Construct nearest neighbours diagonal
+    if (std::fabs(Delta1) >= 1e-14) {
+      for (PetscInt i = Istart; i < Iend; ++i) {
+	local_index = i - basis.global_start_index;
 	  
 #ifdef TIME_CODE
-	  {
-	    Tools::ScopedTimer _timer_{env.tm, "get_coup_elems-d-nn"};
+	{
+	  Tools::ScopedTimer _timer_{env.tm, "get_coup_elems-d-nn"};
 #endif
-	    tmp_elem = HamiltHelper::get_elem_diag(neigh_type::nn,basis.int_basis[local_index], basis.nspins, lattice);
+	  tmp_elem = HamiltHelper::get_elem_diag(neigh_type::nn,basis.int_basis[local_index], basis.nspins, lattice);
 	    
-	    if (tmp_elem == 0)
-	      continue;
+	  if (tmp_elem == 0)
+	    continue;
 	    
-	    elem = Delta1*0.25 * tmp_elem;
+	  elem = Delta1*0.25 * tmp_elem;
 #ifdef TIME_CODE
-	  }
-	  {
-	    Tools::ScopedTimer _timer_{env.tm, "MatSetValues-diag-nn"};
-#endif
-	    ierr = MatSetValue(hamilt,
-			       i,
-			       i,
-			       elem,
-			       ADD_VALUES);
-	    CHKERRQ(ierr);
-#ifdef TIME_CODE
-	  }
-#endif
 	}
-      } // -- If (Delta1)
+	{
+	  Tools::ScopedTimer _timer_{env.tm, "MatSetValues-diag-nn"};
+#endif
+	  ierr = MatSetValue(hamilt,
+			     i,
+			     i,
+			     elem,
+			     ADD_VALUES);
+	  CHKERRQ(ierr);
+#ifdef TIME_CODE
+	}
+#endif
+      }
+    } // -- If (Delta1)
 
       // Construct next-nearest neighbours diagonal
-      if (std::fabs(Delta2) >= 1e-14) {
-	for (PetscInt i = Istart; i < Iend; ++i) {
-	  local_index = i - basis.global_start_index;
+    if (std::fabs(Delta2) >= 1e-14) {
+      for (PetscInt i = Istart; i < Iend; ++i) {
+	local_index = i - basis.global_start_index;
 	  
 #ifdef TIME_CODE
-	  {
-	    Tools::ScopedTimer _timer_{env.tm, "get_coup_elems-d-nnn"};
+	{
+	  Tools::ScopedTimer _timer_{env.tm, "get_coup_elems-d-nnn"};
 #endif
-	    tmp_elem = HamiltHelper::get_elem_diag(neigh_type::nnn,basis.int_basis[local_index], basis.nspins, lattice);
+	  tmp_elem = HamiltHelper::get_elem_diag(neigh_type::nnn,basis.int_basis[local_index], basis.nspins, lattice);
 
-	    if (tmp_elem == 0)
-	      continue;
+	  if (tmp_elem == 0)
+	    continue;
 	    
-	    elem = Delta2*0.25 * tmp_elem;
+	  elem = Delta2*0.25 * tmp_elem;
 #ifdef TIME_CODE
-	  }
-	  {
-	    Tools::ScopedTimer _timer_{env.tm, "MatSetValues-diag-nnn"};
-#endif
-	    ierr = MatSetValue(hamilt,
-			       i,
-			       i,
-			       elem,
-			       ADD_VALUES);
-	    CHKERRQ(ierr);
-#ifdef TIME_CODE
-	  }
-#endif
 	}
-      } // -- If (Delta2)      
-
-    } // -- else
+	{
+	  Tools::ScopedTimer _timer_{env.tm, "MatSetValues-diag-nnn"};
+#endif
+	  ierr = MatSetValue(hamilt,
+			     i,
+			     i,
+			     elem,
+			     ADD_VALUES);
+	  CHKERRQ(ierr);
+#ifdef TIME_CODE
+	}
+#endif
+      }
+    } // -- If (Delta2)      
 
 #ifdef TIME_CODE
   }
@@ -366,9 +362,9 @@ void HamiltHelper::get_coup_elems(neigh_type nt,
   case neigh_type::nn:
     ncol = 0;
     for (PetscInt i = 0; i < basis.nspins; ++i) {
-      for (PetscInt neigh = 1; neigh <= lattice.num_neighbours(); ++neigh) {
+      for (PetscInt neigh = 1; neigh <= lattice.num_nnXsite(i); ++neigh) {
 	
-	PetscInt offset = (lattice.num_neighbours() + 1) * i;
+	PetscInt offset = (lattice.num_nn() + 1) * i;
 	short int spin = lattice.nn[(offset+neigh)];
 	get_coup_elems_AUX(basis, elem, i, spin, ncol, coup_elems);
       }
@@ -379,9 +375,9 @@ void HamiltHelper::get_coup_elems(neigh_type nt,
   case neigh_type::nnn:
     ncol = 0;
     for (PetscInt i = 0; i < basis.nspins; ++i) {
-      for (PetscInt neigh = 1; neigh <= lattice.num_neighbours(); ++neigh) {
+      for (PetscInt neigh = 1; neigh <= lattice.num_nnnXsite(i); ++neigh) {
 	
-  	PetscInt offset = (lattice.num_neighbours() + 1) * i;
+  	PetscInt offset = (lattice.num_nnn() + 1) * i;
   	short int spin = lattice.nnn[(offset+neigh)];
   	get_coup_elems_AUX(basis, elem, i, spin, ncol, coup_elems);   
       }
@@ -405,9 +401,9 @@ PetscInt HamiltHelper::get_elem_diag(neigh_type nt,
     // Go over all nearest neighbours of spin i
   case neigh_type::nn:
     for (PetscInt i = 0; i < nspins; ++i) {
-      for (PetscInt neigh = 1; neigh <= lattice.num_neighbours(); ++neigh) {
+      for (PetscInt neigh = 1; neigh <= lattice.num_nnXsite(i); ++neigh) {
 	
-	PetscInt offset = (lattice.num_neighbours() + 1) * i;
+	PetscInt offset = (lattice.num_nn() + 1) * i;
 	short int spin = lattice.nn[(offset+neigh)];
 	get_elem_diag_AUX(basis_elem, i, spin, diag_elem);
       } 
@@ -417,9 +413,9 @@ PetscInt HamiltHelper::get_elem_diag(neigh_type nt,
     // Go over all nearest neighbours of spin i
   case neigh_type::nnn:
     for (PetscInt i = 0; i < nspins; ++i) {
-      for (PetscInt neigh = 1; neigh <= lattice.num_neighbours(); ++neigh) {
+      for (PetscInt neigh = 1; neigh <= lattice.num_nnnXsite(i); ++neigh) {
 	
-	PetscInt offset = (lattice.num_neighbours() + 1) * i;
+	PetscInt offset = (lattice.num_nnn() + 1) * i;
 	short int spin = lattice.nnn[(offset+neigh)];
 	get_elem_diag_AUX(basis_elem, i, spin, diag_elem);
       } 
@@ -512,7 +508,7 @@ PetscErrorCode Hamiltonian<L>::prealloc(Environment& env) {
 
   //#ifndef DISORDER
   // Add one for the diagonal element if at least one Delta is not zero
-  if ((std::fabs(Delta1) >= 1e-14) | (std::fabs(Delta2) >= 1e-14))
+  //if ((std::fabs(Delta1) >= 1e-14) | (std::fabs(Delta2) >= 1e-14))
     //#endif
     for (PetscInt i = 0; i < local_size; ++i)
       d_nnz[i] += 1;

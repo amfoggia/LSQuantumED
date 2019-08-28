@@ -25,6 +25,7 @@ subdir('include')
 subdir('src')
 
 subdir('examples')
+subdir('postprocessing')
 
 if get_option('BUILD_TEST') == true
    subdir('tests')

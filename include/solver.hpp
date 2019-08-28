@@ -39,7 +39,7 @@ namespace Solver {
   PetscErrorCode SolverClean(EPS& solver);
 
   /**
-   * @fn Solver::solve_lanczos(Environment&, EPS&, PetscInt&)
+   * @fn Solver::solve(Environment&, EPS&, PetscInt&)
    * @brief Calls PETSc functions to solve the system H x = a x.
    * Gets the number of converged eigenpairs.
    * @param [in] env Environment object.
@@ -47,7 +47,7 @@ namespace Solver {
    * @param [out] nconv Number of converged eigenpairs.
    * @return Error value.
    */
-  PetscErrorCode solve_lanczos(Environment& env, EPS& solver, PetscInt& nconv);
+  PetscErrorCode solve(Environment& env, EPS& solver, PetscInt& nconv);
 
   /**
    * @fn Solver::solution(EPS&, PetscInt, PetscScalar&, Vec&, PetscReal&)

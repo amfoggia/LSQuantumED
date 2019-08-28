@@ -10,8 +10,6 @@ solver = files('solver.cpp')
 
 env = files('environment.cpp')
 
-phys = files('phys.cpp')
-
 subdir('spinOperators')
 
 subdir('tools')
@@ -22,7 +20,6 @@ src_files = [basis,
 	     hamilt,
 	     solver,
 	     env,
-	     phys,
 	     src_spinOperators,
 	     src_tools]
 

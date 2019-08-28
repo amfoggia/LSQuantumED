@@ -15,18 +15,18 @@ int main(int argc, char * argv[]) {
 
   PetscErrorCode ierr = 0;
   PetscLogStage stage1, stage2, stage3, stage4a, stage4b;
-  PetscInt nconv, spins;
+  PetscInt nconv;
   PetscScalar real_eig;
   Vec real_vec;
   PetscReal error;
-  PetscScalar exp_val, magAF = 0.0;
+  //  PetscScalar exp_val, magAF = 0.0;
   
-  Environment env{argc,argv,spins,help};
+  Environment env{argc,argv,help};
   
   parse_args();
   print_args();
   
-  Tools::RandomDisorder rd{spins,reprod,min_dis,max_dis,rep};
+  Tools::RandomDisorder rd{env.nspins,reprod,min_dis,max_dis,rep};
 
   ierr = PetscPrintf(MPI_COMM_WORLD, "1- Creating basis\n");
   
@@ -69,7 +69,6 @@ int main(int argc, char * argv[]) {
 		     " iter          k          ||Ax-kx||/||kx||\n"
 		     " ----    -------------   ------------------\n"); CHKERRQ(ierr);
 
-  PetscScalar dynstructfactor;
   Phys::DSF_data<chain1D> dsf_data{};
   dsf_data.b0 = &b;
   dsf_data.b1 = &b;
@@ -87,7 +86,7 @@ int main(int argc, char * argv[]) {
     dsf_data.h1 = &h;
     dsf_data.hi = rd.hi;
     ierr = Solver::SolverInit(solver,h.hamilt,1); CHKERRQ(ierr);
-    ierr = Solver::solve_lanczos(env,solver,nconv); CHKERRQ(ierr);
+    ierr = Solver::solve(env,solver,nconv); CHKERRQ(ierr);
     ierr = MatCreateVecs(h.hamilt,&real_vec,NULL); CHKERRQ(ierr); // --> In here, only when there's disorder
     if (nconv > 0) {      
       for (PetscInt i = 0; i < 1; ++i) {
@@ -114,7 +113,7 @@ int main(int argc, char * argv[]) {
 
     // PetscPrintf(PETSC_COMM_WORLD, "magAF: %.10f\n", magAF/PetscReal(rep)); CHKERRQ(ierr);
 
-    dynstructfactor = Phys::DynStructFactor<chain1D,Sqz>(env, dsf_data, real_eig, real_vec, repet);
+    ierr = Phys::DynStructFactor<chain1D,Sqz>(env, dsf_data, real_eig, real_vec, repet);
 
     ierr = Solver::SolverClean(solver); CHKERRQ(ierr);
     ierr = VecDestroy(&real_vec); CHKERRQ(ierr); // --> In here, only when there's disorder

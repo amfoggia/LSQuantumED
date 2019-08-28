@@ -16,15 +16,15 @@
  * @class Sublattice
  * @brief Creates list of spins that correspond to a certain sublattice type.
  * For example, an antiferromagnetic sublattice or a striped sublattice.
- * @tparam size Number of sublattices of this kind.
  * @tparam L Lattice type.
  */
 
-template<int size,typename L>
+template<typename L>
 class Sublattice {
 
 protected:
   L& lattice; /**< Lattice object. */
+  std::vector<std::vector<PetscInt>> sublat; /**< Vector with sublattice(s). */
 
 public:
 
@@ -40,9 +40,9 @@ public:
    * @fn construct_sublat
    * @brief Constructs the sublattice(s).
    * This is the function the user should provide if it wants to add a new sublattice derived class.
-   * @return An array with the sublattice(s).
+   * @return A vector with the sublattice(s).
    */
-  virtual std::array<std::vector<PetscInt>,size> construct_sublat() = 0;
+  virtual std::vector<std::vector<PetscInt>> construct_sublat() = 0;
 
   /**
    * @fn get_size
@@ -53,7 +53,7 @@ public:
 
   /**
    * @fn get_sl
-   * @brief Returns a reference to the sublattice(s) array.
+   * @brief Returns a reference to the sublattice(s) vector.
    * @param sublat_i The sublattice you want.
    * @return Sublattice.
    */
@@ -73,17 +73,17 @@ public:
 /**
  * @class AF
  * @brief Creates two sublattices that correspond to an antiferromagnetic ground state.
- * @tparam size Number of sublattices of this kind.
  * @tparam L Lattice type.
  */
-template<int size,typename L>
-class AF : public Sublattice<size,L> {
+template<typename L>
+class AF : public Sublattice<L> {
 
 private:
-  std::array<std::vector<PetscInt>,size> sublat; /**< Array with sublattice(s). */
+  std::vector<std::vector<PetscInt>> sublat; /**< Vector with sublattice(s). */
   PetscInt nspins; /**< Number of spins in the system. */
+  PetscInt size; /**< Number of sublattices of this type. */
   
-  std::array<std::vector<PetscInt>,size> construct_sublat() override;
+  std::vector<std::vector<PetscInt>> construct_sublat() override;
   
 public:
 
@@ -91,11 +91,10 @@ public:
    * @fn AF(L&)
    * @brief Constructor.
    * @param[in] m_lattice Lattice object.
+   * @param[in] m_size Number of sublattices of this type.
    */
-  AF(L& m_lattice)
-    : Sublattice<size,L>{m_lattice},
-    nspins{m_lattice.num_spins()}
-  {sublat = construct_sublat();}
+  AF(L& m_lattice,
+     PetscInt m_size);
 
   PetscInt get_size() const override {return size;};
 
@@ -112,26 +111,26 @@ public:
  * @tparam size Number of sublattices of this kind.
  * @tparam L Lattice type.
  */
-template<int size,typename L>
-class Striped : public Sublattice<size,L> {
+template<typename L>
+class Striped : public Sublattice<L> {
 
 private:
-  std::array<std::vector<PetscInt>,size> sublat; /**< Array with sublattice(s). */
+  std::vector<std::vector<PetscInt>> sublat; /**< Vector with sublattice(s). */
   PetscInt nspins; /**< Number of spins in the system. */
+  PetscInt size; /**< Number of sublattices of this type. */
   
-  std::array<std::vector<PetscInt>,size> construct_sublat() override;
+  std::vector<std::vector<PetscInt>> construct_sublat() override;
 public:
 
   /**
    * @fn Striped(L&)
    * @brief Constructor.
    * @param[in] m_lattice Lattice object.
+   * @param[in] m_size Number of sublattices of this type.
    */
-  Striped(L& m_lattice)
-    : Sublattice<size,L>{m_lattice},
-    nspins{m_lattice.nspins}
-  {sublat = construct_sublat();}
-
+  Striped(L& m_lattice,
+	  PetscInt m_size);
+  
   PetscInt get_size() const override {return size;};
 
   const std::vector<PetscInt>& get_sl(PetscInt sublat_i) override {return sublat[sublat_i];}

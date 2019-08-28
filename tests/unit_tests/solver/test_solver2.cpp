@@ -12,7 +12,7 @@ static char help[] = "This is a test to test the Solver namespace\n\n";
 int _argc;
 char ** _argv;
 
-Environment env{_argc,_argv,12,help};
+Environment env{_argc,_argv,help};
 
 class HamiltonianTestEnv : public ::testing::Environment {
 protected:
@@ -27,6 +27,7 @@ TEST(SolverOffdiag, square2Ddiag0) {
   PetscReal Delta1 = 0.0;
   PetscReal J2 = 0.0;
   PetscReal Delta2 = 0.0;
+  env.nspins = 12;
   Basis b{env,4};
   square2D lat{env,3,4};
   Hamiltonian<square2D> h{env,b,lat,J1,Delta1,J2,Delta2};
@@ -38,16 +39,11 @@ TEST(SolverOffdiag, square2Ddiag0) {
 
   ierr = h.build_diag(env); ASSERT_EQ(0,ierr);
   ierr = h.build_off_diag(env); ASSERT_EQ(0,ierr);
-
-#ifdef DISORDER
-  ierr = MatAssemblyBegin(h.hamilt,MAT_FINAL_ASSEMBLY); ASSERT_EQ(0,ierr);
-  ierr = MatAssemblyEnd(h.hamilt,MAT_FINAL_ASSEMBLY); ASSERT_EQ(0,ierr);
-#endif
   
   EXPECT_EQ(0,Solver::SolverInit(solver,h.hamilt,3));
   ierr = EPSSetDimensions(solver, 10, 12, 12); EXPECT_EQ(0,ierr);
  
-  ierr = Solver::solve_lanczos(env,solver,nconv); EXPECT_EQ(0,ierr);
+  ierr = Solver::solve(env,solver,nconv); EXPECT_EQ(0,ierr);
 
   Vec xr;
   ierr = MatCreateVecs(h.hamilt,NULL,&xr); EXPECT_EQ(0,ierr);
@@ -79,6 +75,7 @@ TEST(SolverDelta, square2Dfull) {
   PetscReal Delta1 = 0.3456;
   PetscReal J2 = 0.0;
   PetscReal Delta2 = 0.0;
+  env.nspins = 12;
   Basis b{env,4};
   square2D lat{env,3,4};
   Hamiltonian<square2D> h{env,b,lat,J1,Delta1,J2,Delta2};
@@ -91,15 +88,10 @@ TEST(SolverDelta, square2Dfull) {
   ierr = h.build_diag(env); ASSERT_EQ(0,ierr);
   ierr = h.build_off_diag(env); ASSERT_EQ(0,ierr);
 
-#ifdef DISORDER
-  ierr = MatAssemblyBegin(h.hamilt,MAT_FINAL_ASSEMBLY); ASSERT_EQ(0,ierr);
-  ierr = MatAssemblyEnd(h.hamilt,MAT_FINAL_ASSEMBLY); ASSERT_EQ(0,ierr);
-#endif
-
   EXPECT_EQ(0,Solver::SolverInit(solver,h.hamilt,3));
   ierr = EPSSetDimensions(solver, 10, 12, 12); EXPECT_EQ(0,ierr);
 
-  ierr = Solver::solve_lanczos(env,solver,nconv); EXPECT_EQ(0,ierr);
+  ierr = Solver::solve(env,solver,nconv); EXPECT_EQ(0,ierr);
 
   Vec xr;
   ierr = MatCreateVecs(h.hamilt,NULL,&xr); EXPECT_EQ(0,ierr);
@@ -125,12 +117,12 @@ TEST(SolverDelta, square2Dfull) {
   EXPECT_EQ(0,VecDestroy(&xr));
 }
 
-#ifdef BUILD_SEPARATE
 TEST(SolverDiagonal, square2DNoOffdiag) {
   PetscReal J1 = 1.0;
   PetscReal Delta1 = 1.4;
   PetscReal J2 = 0.0;
   PetscReal Delta2 = 0.0;
+  env.nspins = 12;
   Basis b{env,0};
   square2D lat{env,3,4};
   Hamiltonian<square2D> h{env,b,lat,J1,Delta1,J2,Delta2};
@@ -147,7 +139,7 @@ TEST(SolverDiagonal, square2DNoOffdiag) {
 
   EXPECT_EQ(0,Solver::SolverInit(solver,h.hamilt,2));
 
-  ierr = Solver::solve_lanczos(env,solver,nconv); ASSERT_EQ(0,ierr);
+  ierr = Solver::solve(env,solver,nconv); ASSERT_EQ(0,ierr);
 
   Vec xr;
   ierr = MatCreateVecs(h.hamilt,NULL,&xr); ASSERT_EQ(0,ierr);
@@ -168,7 +160,6 @@ TEST(SolverDiagonal, square2DNoOffdiag) {
   EXPECT_EQ(0,Solver::SolverClean(solver));
   EXPECT_EQ(0,VecDestroy(&xr));
 }
-#endif
 
 int main (int argc, char ** argv){
   _argc = argc;

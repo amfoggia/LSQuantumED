@@ -36,42 +36,40 @@ TEST(DSF, chain1D) {
   PetscErrorCode ierr = 0;
   EPS solver;
   PetscInt nconv;
-  PetscScalar real_eig;
+  PetscScalar real_eig, im_eig;
   PetscReal error;
 
   ierr = h.build_diag(env); ASSERT_EQ(0,ierr);
   ierr = h.build_off_diag(env); ASSERT_EQ(0,ierr);
 
-#ifdef DISORDER
-  ierr = MatAssemblyBegin(h.hamilt,MAT_FINAL_ASSEMBLY); ASSERT_EQ(0,ierr);
-  ierr = MatAssemblyEnd(h.hamilt,MAT_FINAL_ASSEMBLY); ASSERT_EQ(0,ierr);
-#endif
+  MatView(h.hamilt, PETSC_VIEWER_STDOUT_WORLD);
   
   EXPECT_EQ(0,Solver::SolverInit(solver,h.hamilt,1));
  
-  ierr = Solver::solve_lanczos(env,solver,nconv); EXPECT_EQ(0,ierr);
+  ierr = Solver::solve(env,solver,nconv); EXPECT_EQ(0,ierr);
 
-  Vec xr;
+  Vec xr, xi;
   ierr = MatCreateVecs(h.hamilt,NULL,&xr); EXPECT_EQ(0,ierr);
+  ierr = MatCreateVecs(h.hamilt,NULL,&xi); EXPECT_EQ(0,ierr);
 
   ASSERT_GE(nconv,1);
   if (nconv >= 1) {
-    ierr = Solver::solution(solver, 0, real_eig, xr, error); EXPECT_EQ(0,ierr);
+    //    ierr = Solver::solution(solver, 0, real_eig, xr, error); EXPECT_EQ(0,ierr);
+    ierr = EPSGetEigenpair(solver, 0, &real_eig, &im_eig, xr, xi);
     EXPECT_NEAR(-2.8027756377319952, PetscRealPart(real_eig), 1e-13);
+    EXPECT_NEAR(0.0, PetscImaginaryPart(real_eig), 1e-13);
+    PetscPrintf(PETSC_COMM_WORLD, "real_eig: %f, im_eig: %f\n", real_eig, im_eig);
     EXPECT_PRED_FORMAT2(::testing::FloatLE, (double)error, 1e-8);
+    //ierr = VecView(xr, PETSC_VIEWER_STDOUT_WORLD);
+    //ierr = VecView(xi, PETSC_VIEWER_STDOUT_WORLD);
+    //VecDot(xr, xr, &vecdot);
+    //PetscPrintf(PETSC_COMM_WORLD, "vec_dot: %f\n", vecdot);
   }
-
-  std::vector<PetscInt> tmp;
-  for (PetscInt i = 0; i < env.nspins; ++i)
-    tmp.push_back(i);
   
-  PetscScalar dynstructfactor;
   Phys::DSF_data<chain1D> dsf_data{};
   dsf_data.b0 = &b;
   dsf_data.b1 = &b;
   dsf_data.lat = &lat;
-  dsf_data.nQ = 6;
-  dsf_data.qi = &tmp;
   dsf_data.nev = 10;
   dsf_data.ncv = PETSC_DECIDE;
   dsf_data.mpd = PETSC_DECIDE;
@@ -79,13 +77,14 @@ TEST(DSF, chain1D) {
   dsf_data.h1 = &h;
   dsf_data.disorder = PETSC_FALSE;
   dsf_data.hi = NULL;
-  dsf_data.path = "./";
+  dsf_data.path = "./dsf1";
   
-  dynstructfactor = Phys::DynStructFactor<chain1D,Sqz>(env, dsf_data, real_eig, xr, 0);
+  ierr = Phys::DynStructFactor<chain1D,Sqz>(env, dsf_data, real_eig, xr, 0);
   
   EXPECT_EQ(0, ierr);
   EXPECT_EQ(0, Solver::SolverClean(solver));
   EXPECT_EQ(0, VecDestroy(&xr));
+  EXPECT_EQ(0, VecDestroy(&xi));
   
 }
 

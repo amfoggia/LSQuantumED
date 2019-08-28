@@ -23,11 +23,11 @@ public:
 #ifdef TIME_CODE
   Tools::TimeMonitor tm; /**< TimeMonitor object to measure time across the code. */
 #endif
-  PetscBool disorder_flg;
+  PetscBool disorder_flg; /**< Flag that states if disorder realizations are going to be performed. */
   
   // Constructors
   /**
-   * @fn Environment(int, char, PetscInt, char[])
+   * @fn Environment(int, char**, char[])
    * @brief Constructor.
    * Initializes the SLEPc environment.
    * @param[in] argc Number of arguments given to the executable.
@@ -39,7 +39,7 @@ public:
 	      char help[] = nullptr);
 
   /**
-   * @fn Environment(int, char, PetscInt, char[])
+   * @fn Environment(int, char**, PetscInt, char[])
    * @brief Constructor.
    * Initializes the SLEPc environment.
    * @param[in] argc Number of arguments given to the executable.

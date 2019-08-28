@@ -9,8 +9,9 @@ gtest_dep = dependency('gtest', main:false,
 
 exec_construct_hamilt = executable('construct_hamilt.x',
                                   ['test_construct_hamilt.cpp', env, time, lattice, basis, hamilt],
+				  cpp_args:['-I'+boost],
                                   include_directories: inc,
-                                  dependencies: [gtest_dep, petsc_dep, slepc_dep])
+                                  dependencies: [gtest_dep, slepc_dep, mpi_dep, thislib_dep])
 
 _tests = ['construct_hamilt']
 
@@ -43,11 +44,9 @@ subdir('get_coup_elems')
 subdir('build_diag')
 subdir('build_off_diag')
 
-if get_option('DISORDER') == true
-   subdir('tools_random')
-   subdir('get_disorder_elem')
-   subdir('build_disorder')
-endif
+subdir('tools_random')
+subdir('get_disorder_elem')
+subdir('build_disorder')
 
 subdir('prealloc_info')
 

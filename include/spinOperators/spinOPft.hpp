@@ -3,18 +3,16 @@
 
 #include "basis.hpp"
 #include "lattice.hpp"
+#include "hamiltonian.hpp"
 
 /**
  * @struct Sq_data
  * @brief Necessary data for the construction of the Sq operator.
  * Later, in addition of other things, needed for the computation of the Dynamical Structure Factor.
- * @tparam Lattice type.
  */
-template<typename L>
 struct Sq_data {
   Basis* b0; /**< Basis of the Mag = 0 subspace. */
   Basis* b1; /**< Basis of the new subspace. */
-  L* lat; /**< Lattice object. */
 };
 
 /* --------------------------------------------------------------------------- */
@@ -23,10 +21,8 @@ struct Sq_data {
  * @class Sq
  * @brief Creates the Fourier transform of the spin operator.
  * Provides functions to apply the operator to a state vector and to a basis element.
- * @tparam Lattice type.
  */
 
-template<typename L>
 class Sq {
   
 public:
@@ -66,25 +62,15 @@ public:
  * @class Sqz
  * @brief Creates the Fourier transform of the spin operator Sz.
  * Provides functions to apply the operator to a state vector and to a basis element.
- * @tparam Lattice type.
  */
 
-template<typename L>
-class Sqz : public Sq<L> {
+class Sqz : public Sq {
 
 private:
   PetscInt nspins; /**< Number of spins in the system. */
-  Sq_data<L>& data; /**< Sq_data object. */
+  Sq_data& data; /**< Sq_data object. */
   PetscMPIInt mpi_size; /**< Number of MPI processes. */
   PetscMPIInt mpi_rank; /**< Rank label for each process. */
-  std::vector<PetscComplex> exp; /**< Vector with the exponential part of the operator. */
-
-  /**
-   * @fn compute_exp
-   * @brief Computes the exponential part of the Sqz operator.
-   * @return Vector with the exponential part.
-   */
-  std::vector<PetscComplex>& compute_exp();
 
 #ifdef DEVEL
 public:
@@ -99,13 +85,51 @@ public:
    * @param[in] m_env Environment object.
    * @param[in] m_data Sq_data object.
    */
-  Sqz(Environment& m_env, Sq_data<L>& m_data);
+  Sqz(Environment& m_env, Sq_data& m_data);
+
+  void OpOnBasisElems(Environment& env, PetscInt basis_elem, PetscInt spin);
+
+  PetscErrorCode OpOnStateVector(Environment& env, Vec& state, Vec& rhs, PetscInt spin);
+ 
+  ~Sqz() {}
+};
+
+/* --------------------------------------------------------------------------- */
+
+/**
+ * @class Sqp
+ * @brief Creates the Fourier transform of the spin operator Sp.
+ * Provides functions to apply the operator to a state vector and to a basis element.
+ */
+
+class Sqp : public Sq {
+
+private:
+  PetscInt nspins; /**< Number of spins in the system. */
+  Sq_data& data; /**< Sq_data object. */
+  PetscMPIInt mpi_size; /**< Number of MPI processes. */
+  PetscMPIInt mpi_rank; /**< Rank label for each process. */
+
+#ifdef DEVEL
+public:
+#endif
+  PetscInt value; /**< Basis element to which a particular elements is coupled after applying the operator Sp. */
+  
+public:
+
+  /**
+   * @fn Sqp(Environment&)
+   * @brief Constructor.
+   * @param[in] m_env Environment object.
+   * @param[in] m_data Sq_data object.
+   */
+  Sqp(Environment& m_env, Sq_data& m_data);
 
   void OpOnBasisElems(Environment& env, PetscInt basis_elem, PetscInt spin);
 
   PetscErrorCode OpOnStateVector(Environment& env, Vec& state, Vec& rhs, PetscInt spin);
 
-  ~Sqz() {}
+  ~Sqp() {}
 };
 
 #include "spinOPft.tmpl_func.hpp"

@@ -31,7 +31,7 @@ int main(int argc, char * argv[]) {
   ierr = Solver::SolverInit(solver,h.hamilt,1); CHKERRQ(ierr);
   ierr = MatCreateVecs(h.hamilt,&real_vec,NULL); CHKERRQ(ierr);
 
-  ierr = Solver::solve_lanczos(env,solver,nconv); CHKERRQ(ierr);
+  ierr = Solver::solve(env,solver,nconv); CHKERRQ(ierr);
 
   if (nconv > 0) {
     ierr = PetscPrintf(PETSC_COMM_WORLD,

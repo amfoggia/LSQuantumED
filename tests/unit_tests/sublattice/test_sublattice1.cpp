@@ -16,7 +16,7 @@ TEST(SublatticeTest, GetSublatsChain1D) {
   Environment env{_argc,_argv,6,help};
   
   chain1D l1{env};
-  AF<2,chain1D> sublat{l1};
+  AF<chain1D> sublat{l1,3};
   EXPECT_EQ(2,sublat.get_size());
   
   EXPECT_EQ(0,sublat.get_sl(0)[0]);

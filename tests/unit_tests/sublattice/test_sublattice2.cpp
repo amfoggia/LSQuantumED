@@ -18,7 +18,7 @@ TEST(SublatticeTest, GetSublatsSquare2D) {
 /* --------------------------------------------------------------------------- */
   
   square2D l1{env,4,4};
-  AF<2,square2D> sublat1{l1};
+  AF<square2D> sublat1{l1,5};
   EXPECT_EQ(2,sublat1.get_size());
   
   EXPECT_EQ(0,sublat1.get_sl(0)[0]);
@@ -39,7 +39,7 @@ TEST(SublatticeTest, GetSublatsSquare2D) {
   EXPECT_EQ(12,sublat1.get_sl(1)[6]);
   EXPECT_EQ(14,sublat1.get_sl(1)[7]);
 
-  Striped<4,square2D> sublat11{l1};
+  Striped<square2D> sublat11{l1,5};
   EXPECT_EQ(4,sublat11.get_size());
   
   EXPECT_EQ(0,sublat11.get_sl(0)[0]);
@@ -81,7 +81,7 @@ TEST(SublatticeTest, GetSublatsSquare2D) {
 /* --------------------------------------------------------------------------- */
   
   square2D l2{env,2,8};
-  AF<2,square2D> sublat2{l2};
+  AF<square2D> sublat2{l2,46};
   EXPECT_EQ(2,sublat2.get_size());
   
   EXPECT_EQ(0,sublat2.get_sl(0)[0]);
@@ -102,7 +102,7 @@ TEST(SublatticeTest, GetSublatsSquare2D) {
   EXPECT_EQ(12,sublat2.get_sl(1)[6]);
   EXPECT_EQ(14,sublat2.get_sl(1)[7]);
 
-  Striped<4,square2D> sublat22{l2};
+  Striped<square2D> sublat22{l2,54};
   EXPECT_EQ(4,sublat22.get_size());
   
   EXPECT_EQ(0,sublat22.get_sl(0)[0]);
@@ -144,7 +144,7 @@ TEST(SublatticeTest, GetSublatsSquare2D) {
 /* --------------------------------------------------------------------------- */
   
   square2D l3{env,8,2};
-  AF<2,square2D> sublat3{l3};
+  AF<square2D> sublat3{l3,3};
   EXPECT_EQ(2,sublat3.get_size());
   
   EXPECT_EQ(0,sublat3.get_sl(0)[0]);
@@ -165,7 +165,7 @@ TEST(SublatticeTest, GetSublatsSquare2D) {
   EXPECT_EQ(13,sublat3.get_sl(1)[6]);
   EXPECT_EQ(14,sublat3.get_sl(1)[7]);
 
-  Striped<4,square2D> sublat33{l3};
+  Striped<square2D> sublat33{l3,54};
   EXPECT_EQ(4,sublat33.get_size());
   
   EXPECT_EQ(0,sublat33.get_sl(0)[0]);

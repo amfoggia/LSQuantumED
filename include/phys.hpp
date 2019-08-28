@@ -3,6 +3,7 @@
 
 #include "environment.hpp"
 #include "hamiltonian.hpp"
+#include "sublattice.hpp"
 #include "correlation.hpp"
 #include "spinOPft.hpp"
 #include "solver.hpp"
@@ -38,33 +39,37 @@ namespace Phys {
   };
 
   /**
-   * @fn SquaredSubLattMagAF(Environment&, Basis&, const std::array<std::vector<PetscInt>,2>&, Vec&)
+   * @fn SquaredSubLattMagAF(Environment&, Basis&, AF&, Vec&)
    * @brief Computes the magnetic order parameter associated with the antiferromagnetic state.
    * Computes the antiferromagnetic squared sublattice magnetization.
+   * @tparam Lattice type.
    * @param[in] env Environment object.
    * @param[in] basis Basis object.
-   * @param[in] sublat Array with sublattices configurations.
+   * @param[in] sublat AF object.
    * @param[in] state System state to compute the correlations.
    * @return Value of the parameter.
    */
+  template<typename L>
   PetscScalar SquaredSubLattMagAF(Environment& env,
 				  Basis& basis,
-				  const std::array<std::vector<PetscInt>,2>& sublat,
+				  AF<L>& sublat,
 				  Vec& state);
 
   /**
-   * @fn SquaredSubLattMagSTR(Environment&, Basis&, const std::array<std::array<std::vector<PetscInt>,2>,2>&, Vec&)
+   * @fn SquaredSubLattMagSTR(Environment&, Basis&, Striped&, Vec&)
    * @brief Computes the magnetic order parameter associated with the striped state.
    * Computes the striped squared sublattice magnetization.
+   * @tparam Lattice type.
    * @param[in] env Environment object.
    * @param[in] basis Basis object.
-   * @param[in] sublat Array with sublattices configurations.
+   * @param[in] sublat Striped object.
    * @param[in] state System state to compute the correlations.
    * @return Value of the parameter.
    */
+  template<typename L>
   PetscScalar SquaredSubLattMagSTR(Environment& env,
 				   Basis& basis,
-				   const std::array<std::array<std::vector<PetscInt>,2>,2>& sublat,
+				   Striped<L>& sublat,
 				   Vec& state);
 
   /**
@@ -80,12 +85,12 @@ namespace Phys {
    * @param[in] dis_iter Index of disorder realization iterations.
    * @return Value of the parameter.
    */
-  template<typename L, template<typename> class SQ>
-  PetscScalar DynStructFactor(Environment& env,
-			      DSF_data<L>& data,
-			      PetscScalar gs,
-			      Vec& state,
-			      PetscInt dis_iter = 0);
+  template<typename L, typename SQ>
+  PetscErrorCode DynStructFactor(Environment& env,
+				 DSF_data<L>& data,
+				 PetscScalar gs,
+				 Vec& state,
+				 PetscInt dis_iter = 0);
 }
 
 #include "phys.tmpl_func.hpp"

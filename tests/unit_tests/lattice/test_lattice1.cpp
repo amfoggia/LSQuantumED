@@ -20,6 +20,8 @@ TEST(LatticeTest, Constructor) {
   EXPECT_NO_THROW(square2D l2(env,3,4));
   // This one throws an exception because nspins=12 != 4x4
   ASSERT_THROW(square2D l2(env,4,4), std::invalid_argument);
+  // This thriws an exception because in honeycomb lx=2*m and ly=2*n
+  ASSERT_THROW(honeycomb2D l2(env,3,4), std::invalid_argument);
 }
 
 int main(int argc, char* argv[]) {

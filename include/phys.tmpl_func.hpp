@@ -1,13 +1,95 @@
 /* --------------------------------------------------------------------------- */
+// ------------------------ Magnetic Order Parameter ------------------------- //
+/* --------------------------------------------------------------------------- */
+
+template<typename L>
+PetscScalar Phys::SquaredSubLattMagAF(Environment& env,
+				      Basis& basis,
+				      AF<L>& sublat,
+				      Vec& state) {
+
+  PetscScalar mAF = 0.0;
+  
+#ifdef TIME_CODE
+  {
+    Tools::ScopedTimer _timer_{env.tm, "MagAF"};
+#endif
+    
+    SiSj cij{env,basis};
+    
+    PetscScalar exp_val = 0.0;
+    PetscInt spin_i, spin_j;
+    
+    for (PetscInt lat = 0; lat < sublat.get_size(); ++lat) {
+      for (PetscInt i = 0; i < PetscInt(sublat.get_sl(lat).size()); ++i) {
+	spin_i = sublat.get_sl(lat)[i];
+	for (PetscInt j = 0; j < PetscInt(sublat.get_sl(lat).size()); ++j) {
+	  spin_j = sublat.get_sl(lat)[j];
+	  exp_val += cij.ExpectVal(env,spin_i, spin_j, state);
+	}
+      }
+    }
+    
+    mAF = exp_val * 8.0 / PetscScalar(env.nspins) / (PetscScalar(env.nspins + 4.0));
+    
+#ifdef TIME_CODE
+  }
+  env.tm.PrintTimeInfoFunc("MagAF");
+#endif
+  
+  return mAF;
+}
+
+/* --------------------------------------------------------------------------- */
+
+template<typename L>
+PetscScalar Phys::SquaredSubLattMagSTR(Environment& env,
+				       Basis& basis,
+				       Striped<L>& sublat,
+				       Vec& state) {
+
+  PetscScalar mSTR = 0.0;
+
+#ifdef TIME_CODE
+  {
+    Tools::ScopedTimer _timer_{env.tm, "MagSTR"};
+#endif
+    
+    SiSj cij{env,basis};
+
+    PetscScalar exp_val = 0.0;
+    PetscInt spin_i, spin_j;
+
+    for (PetscInt str = 0; str < 2; ++str)
+      for (PetscInt lat = 0; lat < 2; ++lat)
+	for (PetscInt i = 0; i < PetscInt(sublat.get_sl(str*2+lat).size()); ++i) {
+	  spin_i = sublat.get_sl(str*2+lat)[i];
+	  for (PetscInt j = 0; j < PetscInt(sublat.get_sl(str*2+lat).size()); ++j) {
+	    spin_j = sublat.get_sl(str*2+lat)[j];
+	    exp_val += cij.ExpectVal(env,spin_i, spin_j, state);
+	  }
+	}
+
+    mSTR = exp_val * 4.0 / PetscScalar(env.nspins) / (PetscScalar(env.nspins + 4.0));
+
+#ifdef TIME_CODE
+  }
+  env.tm.PrintTimeInfoFunc("MagSTR");
+#endif
+  
+  return mSTR;
+}
+
+/* --------------------------------------------------------------------------- */
 // ------------------------ Dynamical Structure Factor ----------------------- //
 /* --------------------------------------------------------------------------- */
 
-template<typename L, template<typename> class SQ>
-PetscScalar Phys::DynStructFactor(Environment& env,
-				  Phys::DSF_data<L>& data,
-				  PetscScalar gs,
-				  Vec& state,
-				  PetscInt dis_iter) {
+template<typename L, typename SQ>
+PetscErrorCode Phys::DynStructFactor(Environment& env,
+				     Phys::DSF_data<L>& data,
+				     PetscScalar gs,
+				     Vec& state,
+				     PetscInt dis_iter) {
 
   PetscScalar dsf;
   
@@ -20,8 +102,8 @@ PetscScalar Phys::DynStructFactor(Environment& env,
     
     Vec rhs, eig_vec;
     ierr = MatCreateVecs(data.h1->hamilt,&eig_vec,NULL); CHKERRQ(ierr);
-    //ierr = VecCreateMPI(PETSC_COMM_WORLD, PETSC_DECIDE, data.b1->size, &rhs); CHKERRQ(ierr);
-    ierr = VecDuplicate(state, &rhs); CHKERRQ(ierr);
+    ierr = VecCreateMPI(PETSC_COMM_WORLD, PETSC_DECIDE, data.b1->size, &rhs); CHKERRQ(ierr);
+    //ierr = VecDuplicate(state, &rhs); CHKERRQ(ierr);
 
     EPS DSF_solver;
     PetscInt nconv;
@@ -35,7 +117,7 @@ PetscScalar Phys::DynStructFactor(Environment& env,
       
       // Initiate solver and solve
       ierr = Solver::SolverInit(DSF_solver, data.h1->hamilt, data.nev, data.ncv, data.mpd); CHKERRQ(ierr);
-      ierr = Solver::solve_lanczos(env, DSF_solver, nconv); CHKERRQ(ierr);
+      ierr = Solver::solve(env, DSF_solver, nconv); CHKERRQ(ierr);
 #ifdef TIME_CODE
     }
 #endif
@@ -49,7 +131,9 @@ PetscScalar Phys::DynStructFactor(Environment& env,
 		 << "_d" << dis_iter
 		 << ".dat";
 
-    dsf_fp = fopen(dsf_filename.str().c_str(), "a");
+    ierr = PetscFOpen(PETSC_COMM_SELF,dsf_filename.str().c_str(), "w", &dsf_fp); CHKERRQ(ierr);
+    if (!dsf_fp) SETERRQ(PETSC_COMM_SELF, PETSC_ERR_USER, "Cannot open file");
+
     ierr = PetscFPrintf(PETSC_COMM_WORLD,
 			dsf_fp, "#------------------------------- Parameters -------------------------------------\n"); CHKERRQ(ierr);
     ierr = PetscFPrintf(PETSC_COMM_WORLD,
@@ -75,8 +159,8 @@ PetscScalar Phys::DynStructFactor(Environment& env,
     // ------------------------------- FILE -------------------------------------
 
     // Build Sq operator
-    Sq_data<L> sq_data{data.b0, data.b1, data.lat};
-    SQ<L> sq_oper{env, sq_data};
+    Sq_data sq_data{data.b0, data.b1};
+    SQ sq_oper{env, sq_data};
     std::vector<PetscScalar> c0, eigenvals;
     
     for (PetscInt iter_s = 0; iter_s < env.nspins; ++iter_s) {
@@ -118,7 +202,7 @@ PetscScalar Phys::DynStructFactor(Environment& env,
     ierr = Solver::SolverClean(DSF_solver); CHKERRQ(ierr);
     ierr = VecDestroy(&rhs); CHKERRQ(ierr);
     ierr = VecDestroy(&eig_vec); CHKERRQ(ierr);
-    fclose(dsf_fp);
+    ierr = PetscFClose(PETSC_COMM_SELF, dsf_fp); CHKERRQ(ierr);
 
 #ifdef TIME_CODE
   }
@@ -127,5 +211,5 @@ PetscScalar Phys::DynStructFactor(Environment& env,
   env.tm.PrintTimeInfoFunc("DynStructFactor");
 #endif
 
-  return dsf;
+  return ierr;
 }

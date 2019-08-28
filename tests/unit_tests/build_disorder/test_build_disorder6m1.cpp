@@ -16,7 +16,8 @@ int main(int argc, char ** argv) {
   chain1D lat{env};
   Hamiltonian<chain1D> h{env,b,lat,J1,Delta1,J2,Delta2};
   PetscErrorCode ierr = 0;
-
+  env.disorder_flg = PETSC_TRUE;
+  
   PetscReal * hi;
   PetscCalloc1(env.nspins, &hi);
   for (PetscInt i = 0; i < env.nspins; ++i)

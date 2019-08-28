@@ -35,7 +35,7 @@ PetscErrorCode Solver::SolverClean(EPS& solver) {
 // -------------------------- Solving functions ------------------------------ //
 /* --------------------------------------------------------------------------- */
 
-PetscErrorCode Solver::solve_lanczos(Environment& env, EPS& solver, PetscInt& nconv) {
+PetscErrorCode Solver::solve(Environment& env, EPS& solver, PetscInt& nconv) {
   
   PetscErrorCode ierr = 0;
 #ifdef TIME_CODE

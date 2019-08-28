@@ -29,7 +29,7 @@
     ierr = PetscPrintf(PETSC_COMM_WORLD, " ------------------------\n"); CHKERRQ(ierr); \
     ierr = PetscPrintf(PETSC_COMM_WORLD, "%9s:   %4s\n", "disorder", "TRUE"); CHKERRQ(ierr); \
     ierr = PetscPrintf(PETSC_COMM_WORLD, "%9s:   %.5f\n%9s:   %.5f\n", "min dis", min_dis, "max dis", max_dis); CHKERRQ(ierr); \
-    ierr = PetscPrintf(PETSC_COMM_WORLD, "%9s:   %d\n%9s:   %d\n", "reprod?", reprod, "repet", rep); CHKERRQ(ierr); \
+    ierr = PetscPrintf(PETSC_COMM_WORLD, "%9s:   %d\n%9s:   %d\n", "reprod?", reprod, "rep", rep); CHKERRQ(ierr); \
   }									\
   else {								\
     ierr = PetscPrintf(PETSC_COMM_WORLD, " ------------------------\n"); CHKERRQ(ierr); \

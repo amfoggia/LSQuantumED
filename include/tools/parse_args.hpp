@@ -67,5 +67,12 @@
     }									\
   }									\
   ierr = PetscOptionsEnd(); CHKERRQ(ierr);				\
+  check_lattype = PETSC_TRUE;						\
+  if (env.disorder_flg == PETSC_FALSE) {				\
+    max_dis = 0.0;							\
+    min_dis = 0.0;							\
+    reprod = PETSC_TRUE;						\
+    rep = 1;								\
+  }									\
 
 #endif
